@@ -1,0 +1,20 @@
+{
+  "author_names": "Afnan Mostafa, Simon J. L. Billinge, Niaz Abdulrahman, William Ratcliffe",
+  "author_emails": "amostafa@ur.rochester.edu, sbillinge@ucsb.edu, niaz@rochester.edu, wratclif@umd.edu",
+  "maintainer_names": "Afnan Mostafa, Simon J. L. Billinge, Niaz Abdulrahman, William Ratcliffe",
+  "maintainer_emails": "amostafa@ur.rochester.edu, sbillinge@ucsb.edu, niaz@rochester.edu, wratclif@umd.edu",
+  "maintainer_github_usernames": "sbillinge",
+  "contributors": "Afnan Mostafa and contributors to the diffai.xrdreader project",
+  "project_name": "diffai.xrdreader",
+  "license_holders": "diffai.xrdreader contributors",
+  "github_username_or_orgname": "diffractionai",
+  "github_repo_name": "diffai.xrdreader",
+  "conda_pypi_package_dist_name": "diffai.xrdreader",
+  "package_dir_name": "diffai.xrdreader",
+  "project_short_description": "Multi-step agentic framework for extracting powder diffractio",
+  "project_keywords": "n patterns and associated metadata from published literature",
+  "minimum_supported_python_version": "3.12",
+  "maximum_supported_python_version": "3.14",
+  "project_needs_c_code_compiled": "No",
+  "project_has_gui_tests": "Yes"
+}
