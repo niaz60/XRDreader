@@ -1,1 +1,14 @@
+openai
+google-genai
+requests
+PyMuPDF
+pdfplumber
 numpy
+Pillow
+opencv-python
+matplotlib
+streamlit
+arxiv
+beautifulsoup4
+pandas
+springernature-api-client

@@ -8,17 +8,17 @@ dynamic=['version', 'dependencies']
 authors = [
   {name='Afnan Mostafa', email='amostafa@ur.rochester.edu'},
   {name='Simon J. L. Billinge', email='sbillinge@ucsb.edu'},
-  {name='Niaz Abdulrahman', email='niaz@rochester.edu'},
-  {name='William Ratcliffe', email='wratclif@umd.edu'},
+  {name='Niaz Abdolrahim', email='niaz@rochester.edu'},
+  {name='William Ratcliff', email='wratclif@umd.edu'},
 ]
 maintainers = [
   {name='Afnan Mostafa', email='amostafa@ur.rochester.edu'},
   {name='Simon J. L. Billinge', email='sbillinge@ucsb.edu'},
-  {name='Niaz Abdulrahman', email='niaz@rochester.edu'},
-  {name='William Ratcliffe', email='wratclif@umd.edu'},
+  {name='Niaz Abdolrahim', email='niaz@rochester.edu'},
+  {name='William Ratcliff', email='wratclif@umd.edu'},
 ]
-description = "Multi-step agentic framework for extracting powder diffractio"
-keywords = ['n patterns and associated metadata from published literature']
+description = "Multi-step agentic framework for extracting powder diffraction patterns and associated metadata from published literature"
+keywords = ['XRD', 'X-ray diffraction', 'crystallography', 'materials science', 'literature mining', 'LLM']
 readme = "README.rst"
 requires-python = ">=3.12, <3.15"
 classifiers = [
@@ -42,11 +42,26 @@ classifiers = [
 Homepage = "https://github.com/diffractionai/diffai.xrdreader/"
 Issues = "https://github.com/diffractionai/diffai.xrdreader/issues/"
 
+[project.optional-dependencies]
+# Extra dependencies used ONLY by the Streamlit web UI (webapp.py) for CIF
+# export (pymatgen) and Materials Project lookups (mp_api). They are NOT
+# needed for the CLI pipeline. Install them with:
+#     pip install ".[webapp]"
+webapp = [
+    "pymatgen",
+    "mp_api",
+]
+
 [tool.setuptools-git-versioning]
 enabled = true
 template = "{tag}"
 dev_template = "{tag}"
 dirty_template = "{tag}"
+# Derive the version ONLY from real version tags (e.g. 0.1.0). Without this,
+# the most recent tag of ANY name is used, so a snapshot/backup tag like
+# "pre-formatter" becomes the version and `pip install .` fails with
+# InvalidVersion. If no version tag is reachable, the tool falls back to 0.0.1.
+tag_filter = '^[0-9]+\.[0-9]+\.[0-9]+'
 
 [tool.setuptools.packages.find]
 where = ["src"]  # list of folders that contain the packages (["."] by default)

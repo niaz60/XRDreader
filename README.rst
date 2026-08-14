@@ -36,9 +36,12 @@
 .. |Tracking| image:: https://img.shields.io/badge/issue_tracking-github-blue
         :target: https://github.com/diffractionai/diffai.xrdreader/issues
 
-Multi-step agentic framework for extracting powder diffractio
+Multi-step agentic framework for extracting powder X-ray diffraction (XRD) data — figures and metadata — from scientific literature.
 
-* LONGER DESCRIPTION HERE
+XRDReader downloads open-access papers, screens them for XRD relevance, detects and classifies
+figures, extracts crystallographic metadata, and cross-verifies the results. Each step can be
+powered by a different LLM provider (OpenAI, Anthropic, Google, xAI, or open-source models via
+Together AI).
 
 For more information about the diffai.xrdreader library, please consult our `online documentation <https://diffractionai.github.io/diffai.xrdreader>`_.
 
@@ -51,6 +54,11 @@ If you use diffai.xrdreader in a scientific publication, we would like you to ci
 
 Installation
 ------------
+
+.. note::
+
+   The conda-forge and PyPI commands below apply once the package is published to those channels.
+   Until then, install from source with ``pip install .`` (see "install from sources" below).
 
 The preferred method is to use `Miniconda Python
 <https://docs.conda.io/projects/miniconda/en/latest/miniconda-install.html>`_
@@ -80,23 +88,28 @@ and run the following ::
 
         pip install .
 
-This package also provides command-line utilities. To check the software has been installed correctly, type ::
+This package also provides a command-line tool, ``diffai-xrdreader``. To check it has been installed
+correctly, type ::
 
-        diffai.xrdreader --version
+        diffai-xrdreader --help
 
-You can also type the following command to verify the installation. ::
+You can also verify the installed version. ::
 
         python -c "import diffai.xrdreader; print(diffai.xrdreader.__version__)"
 
 
 To view the basic usage and available commands, type ::
 
-        diffai.xrdreader -h
+        diffai-xrdreader -h
 
 Getting Started
 ---------------
 
-You may consult our `online documentation <https://diffractionai.github.io/diffai.xrdreader>`_ for tutorials and API references.
+To run the pipeline from the command line, see `HOW_TO_RUN.md <HOW_TO_RUN.md>`_ — a short, friendly
+guide covering install, quick start, and examples — and `CLI_REFERENCE.md <CLI_REFERENCE.md>`_ for
+every flag and command combination.
+
+You may also consult our `online documentation <https://diffractionai.github.io/diffai.xrdreader>`_ for tutorials and API references.
 
 Support and Contribute
 ----------------------
@@ -129,7 +142,11 @@ Before contributing, please read our `Code of Conduct <https://github.com/diffra
 Contact
 -------
 
-For more information on diffai.xrdreader please visit the project `web-page <https://diffractionai.github.io/>`_ or email the maintainers ``Afnan Mostafa(amostafa@ur.rochester.edu), Simon J. L. Billinge(sbillinge@ucsb.edu), Niaz Abdulrahman(niaz@rochester.edu), and William Ratcliffe(wratclif@umd.edu)``.
+.. TODO: Confirm the maintainer names, emails, and the GitHub org / documentation URLs (used in the
+   badges at the top) before publishing. The list below came from the scikit-package template and
+   may not match the final author list.
+
+For more information on diffai.xrdreader please visit the project `web-page <https://diffractionai.github.io/>`_ or email the maintainers ``Afnan Mostafa(amostafa@ur.rochester.edu), Simon J. L. Billinge(sbillinge@ucsb.edu), Niaz Abdolrahim(niaz@rochester.edu), and William Ratcliff(wratclif@umd.edu)``.
 
 Acknowledgements
 ----------------

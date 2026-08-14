@@ -10,4 +10,7 @@ exclude =
 max-line-length = 79
 # Ignore some style 'errors' produced while formatting by 'black'
 # https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#labels-why-pycodestyle-warnings
-extend-ignore = E203
+# E501 (line too long): black already wraps all code at 79 cols, so the only
+# lines left over are things black cannot break -- long string literals (the
+# LLM prompts), URLs, and comments. We let black own line length.
+extend-ignore = E203, E501

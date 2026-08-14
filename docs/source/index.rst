@@ -21,7 +21,7 @@ To get started, please visit the :ref:`Getting started <getting-started>` page.
 Authors
 =======
 
-``diffai.xrdreader`` is developed by Afnan Mostafa and contributors to the diffai.xrdreader project. This project is maintained by Afnan Mostafa, Simon J. L. Billinge, Niaz Abdulrahman, and William Ratcliffe. For a detailed list of contributors see
+``diffai.xrdreader`` is developed by Afnan Mostafa and contributors to the diffai.xrdreader project. This project is maintained by Afnan Mostafa, Simon J. L. Billinge, Niaz Abdolrahim, and William Ratcliff. For a detailed list of contributors see
 https://github.com/diffractionai/diffai.xrdreader/graphs/contributors.
 
 ============

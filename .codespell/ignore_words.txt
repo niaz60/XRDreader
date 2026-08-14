@@ -6,3 +6,12 @@ mater
 
 ;; Frobenius norm used in np.linalg.norm
 fro
+
+;; chemical element symbols in ELEMENT_NAME_TO_SYMBOL (tellurium, neodymium)
+te
+nd
+
+;; regex alternations, not typos: S(?:upporting|upplementary) and Fig(?:ure)?
+;; in the supporting-information detectors (phase_II_enrichJSON / phase_I)
+upporting
+ure
