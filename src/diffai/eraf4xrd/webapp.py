@@ -3152,7 +3152,7 @@ if st.session_state.current_page == "home":
         <div class="diffai-grid">
             <div class="tool-card active" id="eraf4xrd-card" onclick="this.classList.toggle('selected'); document.getElementById('xrd-open-hint').style.display = this.classList.contains('selected') ? 'block' : 'none';">
                 <div class="tool-icon">&#x1F4CA;</div>
-                <div class="tool-name">XRD<span style="font-variant: small-caps;">reader</span></div>
+                <div class="tool-name">ERAF4XRD</div>
                 <div class="tool-desc">
                     Extract XRD data from scientific papers. Downloads PDFs, screens for XRD content,
                     detects figures, extracts metadata, and digitizes diffraction curves.
@@ -3202,7 +3202,7 @@ st.markdown(
     """
 <div class="hero-shell">
     <div class="hero-kicker">X-ray diffraction data, simplified</div>
-    <div class="hero-title">XRD<span style="font-variant: small-caps;">reader</span></div>
+    <div class="hero-title">ERAF4XRD</div>
     <div class="hero-subtitle">
         <span class="hero-highlight">From scientific papers to structured data</span><br>
         Extract, organize, and analyze XRD data.
