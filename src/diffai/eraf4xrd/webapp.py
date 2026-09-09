@@ -999,9 +999,62 @@ pre code.hljs, pre code.hljs span,
 import streamlit.components.v1 as components  # noqa: E402
 
 BASE_DIR = Path(__file__).resolve().parent
-PDF_DIR = BASE_DIR / "downloaded_PDFs"
-LOG_DIR = BASE_DIR / "logs"
-OUT_DIR = BASE_DIR / "outputs"
+
+
+def runs_root() -> Path:
+    """The folder holding every timestamped run (``<workdir>/eraf4xrd_output``).
+
+    Taken from config so the UI and the pipeline can never disagree.
+    ``config.OUTPUT_ROOT`` carries a fresh timestamp per process, so only its
+    parent is stable -- that parent is what collects the runs.
+    """
+    from diffai.eraf4xrd import config as _cfg
+
+    return Path(_cfg.OUTPUT_ROOT).parent
+
+
+def list_runs():
+    """Every run folder, newest first (names are timestamps, so name-sorted)."""
+    root = runs_root()
+    if not root.exists():
+        return []
+    return sorted(
+        (d for d in root.iterdir() if d.is_dir()),
+        key=lambda d: d.name,
+        reverse=True,
+    )
+
+
+def active_run():
+    """The run the user picked in the sidebar, else the most recent one."""
+    runs = list_runs()
+    if not runs:
+        return None
+    chosen = st.session_state.get("active_run_dir")
+    for r in runs:
+        if str(r) == chosen:
+            return r
+    return runs[0]
+
+
+# Browse/JSON tabs read from the active run. Before the first run there is
+# nothing to show, so these point into a folder that does not exist and every
+# listing falls through to its "nothing yet" branch.
+RUN_DIR = active_run()
+_run_base = RUN_DIR if RUN_DIR is not None else runs_root() / "_no_runs_yet"
+PDF_DIR = _run_base / "documents"
+LOG_DIR = _run_base / "logs"
+OUT_DIR = _run_base / "results"
+
+
+def rel_to_run(path: Path) -> str:
+    """Display path, relative to the run folder when possible."""
+    for base in (_run_base, runs_root()):
+        try:
+            return str(Path(path).relative_to(base))
+        except ValueError:
+            continue
+    return str(path)
 
 
 def _extract_usage_table(text: str):
@@ -3565,6 +3618,25 @@ with st.sidebar:
             disabled=sidebar_disabled,
         )
 
+    # ---- which run the Browse / JSON tabs read from -------------------
+    _runs = list_runs()
+    with st.expander("Run folder", expanded=False):
+        if _runs:
+            st.selectbox(
+                "Showing results from",
+                [str(r) for r in _runs],
+                key="active_run_dir",
+                format_func=lambda v: Path(v).name,
+                help="Every pipeline run writes a timestamped folder. Pick "
+                "one to browse its documents, logs and JSON output.",
+            )
+            st.caption(f"{len(_runs)} run(s) in {runs_root()}")
+        else:
+            st.caption(
+                f"No runs yet in {runs_root()} -- results appear here "
+                "after the pipeline writes its first output."
+            )
+
 tab_run, tab_browse, tab_results = st.tabs(
     ["Run framework", "Browse files", "JSON outputs"]
 )
@@ -3880,7 +3952,7 @@ with tab_browse:
             pdfs = newest_files(PDF_DIR, "*.pdf", limit=25)
             if pdfs:
                 for p in pdfs[:8]:
-                    rel_path = str(p.relative_to(BASE_DIR))
+                    rel_path = rel_to_run(p)
                     st.markdown(
                         f'<div style="padding:6px 0;border-bottom:1px solid #e5e7eb;">'
                         f'<div style="font-weight:600;font-size:0.9rem;">{p.name}</div>'
@@ -3965,7 +4037,7 @@ with tab_results:
             "Compare multiple JSON outputs",
             json_files,
             default=[],
-            format_func=lambda p: str(p.relative_to(BASE_DIR)),
+            format_func=lambda p: rel_to_run(p),
         )
 
         if compare_selection:
@@ -4053,7 +4125,7 @@ with tab_results:
         @st.cache_data(ttl=30)
         def _json_label(p_str):
             p = Path(p_str)
-            label = str(p.relative_to(BASE_DIR))
+            label = rel_to_run(p)
             try:
                 _d = json.loads(
                     p.read_text(encoding="utf-8", errors="replace")
