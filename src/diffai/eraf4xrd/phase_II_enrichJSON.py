@@ -318,8 +318,6 @@ VERIFY_PROMPT = (
 )
 
 VERIFY_CACHE_DIR = PHASE1_DIR / "_agent_cache_phase2"
-if PHASE2_USE_VERIFY_CACHE:
-    VERIFY_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 XRD_TEXT_TOKENS = [
     "xrd",
@@ -1376,6 +1374,8 @@ def llm_verify_candidate(candidate: Dict, context_text: str) -> Optional[Dict]:
     out["space_group"] = norm_item(out.get("space_group"), is_list=True)
 
     if cache_path is not None:
+        # Created lazily; see the note in phase_I_classify_genJSON.
+        VERIFY_CACHE_DIR.mkdir(parents=True, exist_ok=True)
         cache_path.write_text(
             json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8"
         )

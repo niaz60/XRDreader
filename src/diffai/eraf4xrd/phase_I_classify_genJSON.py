@@ -69,8 +69,6 @@ from diffai.eraf4xrd.config import (  # noqa: E402
 PHASE1_AGENT_MAX_STEPS = int(os.getenv("PHASE1_AGENT_MAX_STEPS", "6"))
 PHASE1_AGENT_MAX_RETRIES = int(os.getenv("PHASE1_AGENT_MAX_RETRIES", "3"))
 
-OUT_ROOT.mkdir(parents=True, exist_ok=True)
-
 
 def get_phase1_provider() -> str:
     return (
@@ -666,8 +664,6 @@ AGENTIC_FIG_MATCH_AND_XRD_PROMPT = (
 )
 
 CALL_CACHE_DIR = OUT_ROOT / "_agent_cache_phase1"
-if PHASE1_USE_CALL_CACHE:
-    CALL_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def page_has_xrd_like_text(page_pl) -> bool:
@@ -864,6 +860,9 @@ def cached_call_llm_json(
     obj = call_llm_json(
         client, prompt, highlighted_page_png, crop_png, log_prefix=log_prefix
     )
+    # Created lazily: importing this module must not touch the filesystem,
+    # or anything that merely inspects it leaves a stray run folder behind.
+    CALL_CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
         json.dumps(obj, ensure_ascii=False, indent=2), encoding="utf-8"
     )
@@ -2277,6 +2276,12 @@ def main(pdf_dir=None):
     model = get_phase1_model()
     print(f"[INFO] Phase 1 using provider={provider}, model={model}")
     client = build_client()
+
+    # Created here rather than at import time: importing this module must
+    # not touch the filesystem, or anything that merely inspects it (Sphinx,
+    # a linter, a test collector) leaves a stray timestamped run folder
+    # behind in the working directory.
+    OUT_ROOT.mkdir(parents=True, exist_ok=True)
 
     # The caller (pipeline.py) already decided which folder to use, based on
     # whether screening ran this session. Honour that instead of re-deciding --
