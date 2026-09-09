@@ -1,4 +1,4 @@
-"""CLI flags -> environment mapping (diffai.xrdreader.app._apply_cli_flags).
+"""CLI flags -> environment mapping (diffai.eraf4xrd.app._apply_cli_flags).
 
 These run offline: _apply_cli_flags only translates flags into os.environ; it
 does not import config or make any network calls.
@@ -8,7 +8,7 @@ import os
 
 import pytest
 
-from diffai.xrdreader.app import STEP_ENVS, _apply_cli_flags
+from diffai.eraf4xrd.app import STEP_ENVS, _apply_cli_flags
 
 
 @pytest.fixture(autouse=True)

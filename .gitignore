@@ -19,8 +19,8 @@ ENV/
 .env.*
 .streamlit/secrets.toml
 
-# XRDReader generated data / outputs (regenerable — not code)
-xrdreader_output/
+# ERAF4XRD generated data / outputs (regenerable — not code)
+eraf4xrd_output/
 downloaded_PDFs/
 outputs/
 *.log

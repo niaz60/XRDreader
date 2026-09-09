@@ -3,9 +3,9 @@
 |title|
 =======
 
-.. |title| replace:: diffai.xrdreader package
+.. |title| replace:: diffai.eraf4xrd package
 
-.. automodule:: diffai.xrdreader
+.. automodule:: diffai.eraf4xrd
     :members:
     :undoc-members:
     :show-inheritance:
@@ -14,7 +14,7 @@ Subpackages
 -----------
 
 .. toctree::
-   diffai.xrdreader.example_package
+   diffai.eraf4xrd.example_package
 
 Submodules
 ----------
@@ -22,9 +22,9 @@ Submodules
 |module|
 --------
 
-.. |module| replace:: diffai.xrdreader.example_submodule module
+.. |module| replace:: diffai.eraf4xrd.example_submodule module
 
-.. automodule:: diffai.xrdreader.example_submodule
+.. automodule:: diffai.eraf4xrd.example_submodule
     :members:
     :undoc-members:
     :show-inheritance:

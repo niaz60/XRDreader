@@ -13,14 +13,14 @@ import time
 
 import requests
 
-from diffai.xrdreader.config import (
+from diffai.eraf4xrd.config import (
     OUTPUT_PDF_DIR,
     REQUIRE_CC_LICENSE,
     SEARCH_KEYWORDS,
     SLEEP,
     TARGET_DOWNLOADS,
 )
-from diffai.xrdreader.utils import (
+from diffai.eraf4xrd.utils import (
     ensure_dir,
     get_source_subdir,
     log,

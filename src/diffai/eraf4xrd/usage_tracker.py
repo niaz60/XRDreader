@@ -1,11 +1,11 @@
 """
-LLM usage tracker for XRDReader pipeline.
+LLM usage tracker for ERAF4XRD pipeline.
 
 Captures tokens, requests, cost, and wall-clock time per phase.
 Drop this file next to pipeline.py and import where needed.
 
 Usage:
-    from diffai.xrdreader.usage_tracker import UsageTracker, set_tracker, get_tracker
+    from diffai.eraf4xrd.usage_tracker import UsageTracker, set_tracker, get_tracker
 
     tracker = UsageTracker()
     set_tracker(tracker)

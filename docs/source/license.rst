@@ -9,7 +9,7 @@ OPEN SOURCE LICENSE AGREEMENT
 =============================
 BSD 3-Clause License
 
-Copyright (c) 2026, diffai.xrdreader contributors.
+Copyright (c) 2026, diffai.eraf4xrd contributors.
 All Rights Reserved.
 
 Redistribution and use in source and binary forms, with or without

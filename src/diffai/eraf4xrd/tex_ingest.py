@@ -50,7 +50,7 @@ def fetch_tex_source(arxiv_id, timeout=90):
     """Download an arXiv paper's LaTeX source and inline its includes."""
     req = urllib.request.Request(
         f"https://arxiv.org/e-print/{arxiv_id}",
-        headers={"User-Agent": "Mozilla/5.0 (XRDReader research)"},
+        headers={"User-Agent": "Mozilla/5.0 (ERAF4XRD research)"},
     )
     data = urllib.request.urlopen(req, timeout=timeout).read()
     files = _members(data)

@@ -9,8 +9,8 @@ single main material, and keeps only the fields downstream needs. Reads each
 import json
 from pathlib import Path
 
-from diffai.xrdreader.config import PHASE1_DIR
-from diffai.xrdreader.utils import make_safe_stem
+from diffai.eraf4xrd.config import PHASE1_DIR
+from diffai.eraf4xrd.utils import make_safe_stem
 
 
 def safe_get(d, *keys):

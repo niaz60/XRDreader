@@ -21,7 +21,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import fitz
 import pdfplumber
 
-from diffai.xrdreader.config import (
+from diffai.eraf4xrd.config import (
     ENABLE_AGENTIC_PHASE3,
     MAX_FIGURE_CONTEXT_CHARS_VERIFY,
     MAX_GLOBAL_CONTEXT_CHARS_VERIFY,
@@ -30,7 +30,7 @@ from diffai.xrdreader.config import (
     PROVIDER,
     USE_XRD_FOCUSED_TEXT_VERIFY,
 )
-from diffai.xrdreader.utils import make_safe_stem
+from diffai.eraf4xrd.utils import make_safe_stem
 
 # Agent loop knobs (env-overridable)
 PHASE3_AGENT_MAX_STEPS = int(os.getenv("PHASE3_AGENT_MAX_STEPS", "12"))
@@ -1192,7 +1192,7 @@ def call_text_llm(prompt_a: str, prompt_b: str) -> str:
             ],
             temperature=_temperature,
         )
-        from diffai.xrdreader.usage_tracker import get_tracker
+        from diffai.eraf4xrd.usage_tracker import get_tracker
 
         get_tracker().log_call(
             phase="phase3",
@@ -1248,7 +1248,7 @@ def call_text_llm(prompt_a: str, prompt_b: str) -> str:
         }
         _t0 = time.time()
         obj = _http_post_json(url, payload, headers={})
-        from diffai.xrdreader.usage_tracker import log_http_call
+        from diffai.eraf4xrd.usage_tracker import log_http_call
 
         log_http_call(
             "phase3",
@@ -1294,7 +1294,7 @@ def call_text_llm(prompt_a: str, prompt_b: str) -> str:
                 "anthropic-version": "2023-06-01",
             },
         )
-        from diffai.xrdreader.usage_tracker import log_http_call
+        from diffai.eraf4xrd.usage_tracker import log_http_call
 
         log_http_call(
             "phase3",
@@ -1330,7 +1330,7 @@ def call_text_llm(prompt_a: str, prompt_b: str) -> str:
             ],
             temperature=_temperature,
         )
-        from diffai.xrdreader.usage_tracker import get_tracker
+        from diffai.eraf4xrd.usage_tracker import get_tracker
 
         _tracker = get_tracker()
         usage = getattr(resp, "usage", None)
@@ -2093,7 +2093,7 @@ def run_phase3_verify_agent(
     provider = os.environ.get("VERIFY_PROVIDER", PROVIDER).strip().lower()
     model = os.environ.get("VERIFY_MODEL", MODEL).strip()
 
-    from diffai.xrdreader.tool_calling import ToolCaller
+    from diffai.eraf4xrd.tool_calling import ToolCaller
 
     toolbox = Phase3AgentToolbox(
         doc, pages_text, pdf_path=pdf_path, crop_dir=crop_dir
@@ -2124,7 +2124,7 @@ def run_phase3_verify_agent(
             tool_calls, _ = caller.call(PHASE3_AGENT_TOOLS)
             elapsed = time.time() - _t0
 
-            from diffai.xrdreader.usage_tracker import get_tracker
+            from diffai.eraf4xrd.usage_tracker import get_tracker
 
             usage = caller.get_last_call_usage()
             get_tracker().log_call(

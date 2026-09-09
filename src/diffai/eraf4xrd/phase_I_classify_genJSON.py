@@ -31,14 +31,14 @@ import pdfplumber
 from openai import OpenAI
 from PIL import Image, ImageDraw
 
-from diffai.xrdreader.utils import make_safe_stem
+from diffai.eraf4xrd.utils import make_safe_stem
 
 logging.getLogger("pdfminer").setLevel(logging.ERROR)
 
 # ======================================================================================
 # 1) EDIT HERE: Paths + knobs
 # ======================================================================================
-from diffai.xrdreader.config import (  # noqa: E402
+from diffai.eraf4xrd.config import (  # noqa: E402
     BASE_SLEEP_SEC,
     DPI_CROP,
     DPI_PAGE,
@@ -266,7 +266,7 @@ def extract_main_material_with_llm(
                 model=model,
                 input=prompt,
             )
-            from diffai.xrdreader.usage_tracker import get_tracker
+            from diffai.eraf4xrd.usage_tracker import get_tracker
 
             get_tracker().log_call(
                 phase="phase1",
@@ -291,7 +291,7 @@ def extract_main_material_with_llm(
             payload = {"contents": [{"parts": [{"text": prompt}]}]}
             _t0 = time.time()
             resp = _http_post_json(url, payload, {})
-            from diffai.xrdreader.usage_tracker import log_http_call
+            from diffai.eraf4xrd.usage_tracker import log_http_call
 
             log_http_call(
                 "phase1",
@@ -1251,7 +1251,7 @@ def call_llm_json(
                     ],
                     temperature=0.0,
                 )
-                from diffai.xrdreader.usage_tracker import get_tracker
+                from diffai.eraf4xrd.usage_tracker import get_tracker
 
                 get_tracker().log_call(
                     phase="phase1",
@@ -1291,7 +1291,7 @@ def call_llm_json(
                     ],
                     temperature=0.0,
                 )
-                from diffai.xrdreader.usage_tracker import (
+                from diffai.eraf4xrd.usage_tracker import (
                     get_tracker as _get_tracker,
                 )
 
@@ -1349,7 +1349,7 @@ def call_llm_json(
                 }
                 _t0 = time.time()
                 obj = _http_post_json(url, payload, headers={})
-                from diffai.xrdreader.usage_tracker import log_http_call
+                from diffai.eraf4xrd.usage_tracker import log_http_call
 
                 log_http_call(
                     "phase1",
@@ -1414,7 +1414,7 @@ def call_llm_json(
                         "anthropic-version": "2023-06-01",
                     },
                 )
-                from diffai.xrdreader.usage_tracker import log_http_call
+                from diffai.eraf4xrd.usage_tracker import log_http_call
 
                 log_http_call(
                     "phase1",
@@ -1904,7 +1904,7 @@ def run_phase1_agent(
 
     import base64
 
-    from diffai.xrdreader.tool_calling import ToolCaller
+    from diffai.eraf4xrd.tool_calling import ToolCaller
 
     toolbox = Phase1AgentToolbox(doc, pdf_pl, page_index0, bbox_pl, page_pl)
 
@@ -1937,7 +1937,7 @@ def run_phase1_agent(
         tool_calls, _ = caller.call(PHASE1_AGENT_TOOLS)
         elapsed = time.time() - _t0
 
-        from diffai.xrdreader.usage_tracker import get_tracker
+        from diffai.eraf4xrd.usage_tracker import get_tracker
 
         usage = caller.get_last_call_usage()
         get_tracker().log_call(
@@ -2303,10 +2303,10 @@ def main(pdf_dir=None):
         try:
             process_pdf(client, p)
         except Exception as e:
-            from diffai.xrdreader.utils import humanize_llm_error
+            from diffai.eraf4xrd.utils import humanize_llm_error
 
             print(f"[FAILED] {p.name}: {humanize_llm_error(e)}")
-            if os.getenv("XRDREADER_DEBUG"):
+            if os.getenv("ERAF4XRD_DEBUG"):
                 import traceback
 
                 traceback.print_exc()

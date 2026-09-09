@@ -1,4 +1,4 @@
-"""Shared helpers used across every XRDReader phase.
+"""Shared helpers used across every ERAF4XRD phase.
 
 Filename sanitizing (make_pdf_safe_title / make_safe_stem), a Windows/Unicode-
 safe logger, directory helpers, a retrying binary writer, thin PyMuPDF /
@@ -362,7 +362,7 @@ def log_download(
     """Append one download record to outputs/download_provenance.json."""
     global _PROVENANCE_PATH
     if _PROVENANCE_PATH is None:
-        from diffai.xrdreader.config import OUT_ROOT
+        from diffai.eraf4xrd.config import OUT_ROOT
 
         _PROVENANCE_PATH = OUT_ROOT / "download_provenance.json"
 
@@ -407,7 +407,7 @@ def log_confidence(
     Call this after every prediction where the LLM returns a confidence score.
     `outcome` is filled in later during verification (supported/unsupported/correct/incorrect).
     """
-    from diffai.xrdreader.config import (
+    from diffai.eraf4xrd.config import (
         CONFIDENCE_LOG_PATH,
         ENABLE_CONFIDENCE_LOGGING,
     )

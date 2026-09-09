@@ -1,7 +1,7 @@
 """Pure helpers: tool-schema conversion and human-readable error messages."""
 
-from diffai.xrdreader.tool_calling import _openai_tools_to_chat_completions
-from diffai.xrdreader.utils import humanize_llm_error
+from diffai.eraf4xrd.tool_calling import _openai_tools_to_chat_completions
+from diffai.eraf4xrd.utils import humanize_llm_error
 
 RESPONSES_TOOL = {
     "type": "function",

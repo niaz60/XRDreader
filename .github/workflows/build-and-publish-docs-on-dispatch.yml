@@ -12,7 +12,7 @@ jobs:
   docs:
     uses: scikit-package/release-scripts/.github/workflows/_release-docs.yml@v0
     with:
-      project: diffai.xrdreader
+      project: diffai.eraf4xrd
       c_extension: false
       headless: true
       python_version: ${{ fromJSON(needs.get-python-version.outputs.latest_python_version) }}

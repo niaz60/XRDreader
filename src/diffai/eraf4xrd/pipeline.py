@@ -1,4 +1,4 @@
-"""Pipeline orchestrator for XRDReader.
+"""Pipeline orchestrator for ERAF4XRD.
 
 Runs the enabled stages in order -- download -> Phase 0 (screen) -> Phase I
 (figures) -> Phase II (metadata) -> JSON clean -> Phase III (verify) ->
@@ -12,7 +12,7 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-from diffai.xrdreader.config import (
+from diffai.eraf4xrd.config import (
     MODEL,
     OUT_ROOT,
     OUTPUT_PDF_DIR,
@@ -31,8 +31,8 @@ from diffai.xrdreader.config import (
     USE_ELSEVIER,
     USE_SPRINGER,
 )
-from diffai.xrdreader.usage_tracker import UsageTracker, set_tracker
-from diffai.xrdreader.utils import log
+from diffai.eraf4xrd.usage_tracker import UsageTracker, set_tracker
+from diffai.eraf4xrd.utils import log
 
 
 # ---------------------------------------------------------------------------
@@ -40,7 +40,7 @@ from diffai.xrdreader.utils import log
 # ---------------------------------------------------------------------------
 def _save_run_manifest():
     """Dump all config values + env state to outputs/run_manifest.json."""
-    from diffai.xrdreader import config as cfg
+    from diffai.eraf4xrd import config as cfg
 
     manifest = {
         "timestamp": datetime.now().isoformat(),
@@ -108,7 +108,7 @@ def _save_run_manifest():
 # ---------------------------------------------------------------------------
 def _consolidate_phase0():
     """Collect all Phase 0 decisions into one summary JSON."""
-    from diffai.xrdreader import config as cfg
+    from diffai.eraf4xrd import config as cfg
 
     results = []
     # read every phase0 decision json from the keep + reject folders
@@ -160,7 +160,7 @@ def _consolidate_phase0():
 # ---------------------------------------------------------------------------
 def _save_per_pdf_timing(tracker: UsageTracker):
     """Aggregate usage tracker calls by pdf_name and save."""
-    from diffai.xrdreader import config as cfg
+    from diffai.eraf4xrd import config as cfg
 
     per_pdf = {}
     # group every tracked LLM call by pdf, then by phase
@@ -259,7 +259,7 @@ def _skip_missing_input(
         log(
             f"  results/ holds {needed_glob}) -- NOT -i, which only feeds PDFs into step0/step1:"
         )
-        log(f"     --steps {resume_step} -o xrdreader_output\\<DATE>_<TIME>")
+        log(f"     --steps {resume_step} -o eraf4xrd_output\\<DATE>_<TIME>")
 
 
 def pipeline():
@@ -281,7 +281,7 @@ def pipeline():
         log("Download agents config -> no LLM used")
 
         if USE_ARXIV:
-            from diffai.xrdreader.downloaders.arxiv_downloader import (
+            from diffai.eraf4xrd.downloaders.arxiv_downloader import (
                 download_arxiv_pdfs,
             )
 
@@ -289,7 +289,7 @@ def pipeline():
             any_downloads |= download_arxiv_pdfs()
 
         if USE_SPRINGER:
-            from diffai.xrdreader.downloaders.springer_downloader import (
+            from diffai.eraf4xrd.downloaders.springer_downloader import (
                 download_springer_pdfs,
             )
 
@@ -297,7 +297,7 @@ def pipeline():
             any_downloads |= download_springer_pdfs()
 
         if USE_ELSEVIER:
-            from diffai.xrdreader.downloaders.elsevier_downloader import (
+            from diffai.eraf4xrd.downloaders.elsevier_downloader import (
                 download_elsevier_pdfs,
             )
 
@@ -305,7 +305,7 @@ def pipeline():
             any_downloads |= download_elsevier_pdfs()
 
         if USE_CROSSREF:
-            from diffai.xrdreader.downloaders.crossref_downloader import (
+            from diffai.eraf4xrd.downloaders.crossref_downloader import (
                 download_crossref_oa_pdfs,
             )
 
@@ -322,7 +322,7 @@ def pipeline():
             _log_agent_config(
                 "Phase 0 agent", "PHASE0_PROVIDER", "PHASE0_MODEL"
             )
-            from diffai.xrdreader import phase_0_download_filter as phase0
+            from diffai.eraf4xrd import phase_0_download_filter as phase0
 
             phase0.main()
         else:
@@ -344,7 +344,7 @@ def pipeline():
             _log_agent_config(
                 "Phase 1 agent", "PHASE1_PROVIDER", "PHASE1_MODEL"
             )
-            from diffai.xrdreader import phase_I_classify_genJSON as phase1
+            from diffai.eraf4xrd import phase_I_classify_genJSON as phase1
 
             phase1.main()
         else:
@@ -360,7 +360,7 @@ def pipeline():
             _log_agent_config(
                 "Phase 2 agent", "PHASE2_PROVIDER", "PHASE2_MODEL"
             )
-            from diffai.xrdreader import phase_II_enrichJSON as phase2
+            from diffai.eraf4xrd import phase_II_enrichJSON as phase2
 
             phase2.main()
         else:
@@ -380,7 +380,7 @@ def pipeline():
         if enriched_jsons:
             log("Starting JSON clean agent...")
             _log_agent_config("JSON clean agent")
-            from diffai.xrdreader import JSON_cleaner as json_cleaner
+            from diffai.eraf4xrd import JSON_cleaner as json_cleaner
 
             json_cleaner.main()
         else:
@@ -402,7 +402,7 @@ def pipeline():
             _log_agent_config(
                 "JSON verify agent", "VERIFY_PROVIDER", "VERIFY_MODEL"
             )
-            from diffai.xrdreader import (
+            from diffai.eraf4xrd import (
                 phase_III_verifyJSON as phase_III_verifyJSON,
             )
 
@@ -423,13 +423,13 @@ def pipeline():
     digitizer_available = False
     if RUN_DIGITIZER:
         try:
-            from diffai.xrdreader.config import (
+            from diffai.eraf4xrd.config import (
                 DIGITIZER_ALGORITHM,
                 DIGITIZER_MODEL,
                 DIGITIZER_OUTPUT_DIR,
                 PALETTE_PATH,
             )
-            from diffai.xrdreader.digitizer import (
+            from diffai.eraf4xrd.digitizer import (
                 build_digitized_output,
                 digitize_figure,
                 discover_xrd_figures,

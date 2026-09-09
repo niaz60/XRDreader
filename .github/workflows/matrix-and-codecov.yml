@@ -14,7 +14,7 @@ jobs:
   matrix-coverage:
     uses: scikit-package/release-scripts/.github/workflows/_matrix-and-codecov-on-merge-to-main.yml@v0
     with:
-      project: diffai.xrdreader
+      project: diffai.eraf4xrd
       c_extension: false
       headless: true
     secrets:
