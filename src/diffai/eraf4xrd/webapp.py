@@ -1025,15 +1025,23 @@ def list_runs():
     )
 
 
+# Sentinel for "whatever the newest run is right now". Storing a concrete
+# path instead would pin the tabs to the run that happened to be newest when
+# the page first loaded, so a run started from the UI would finish and still
+# not be shown.
+LATEST_RUN = "__latest__"
+
+
 def active_run():
-    """The run the user picked in the sidebar, else the most recent one."""
+    """The run the user pinned in the sidebar, else the most recent one."""
     runs = list_runs()
     if not runs:
         return None
-    chosen = st.session_state.get("active_run_dir")
-    for r in runs:
-        if str(r) == chosen:
-            return r
+    chosen = st.session_state.get("active_run_dir", LATEST_RUN)
+    if chosen and chosen != LATEST_RUN:
+        for r in runs:
+            if str(r) == chosen:
+                return r
     return runs[0]
 
 
@@ -3624,11 +3632,16 @@ with st.sidebar:
         if _runs:
             st.selectbox(
                 "Showing results from",
-                [str(r) for r in _runs],
+                [LATEST_RUN] + [str(r) for r in _runs],
                 key="active_run_dir",
-                format_func=lambda v: Path(v).name,
-                help="Every pipeline run writes a timestamped folder. Pick "
-                "one to browse its documents, logs and JSON output.",
+                format_func=lambda v: (
+                    f"Latest run ({_runs[0].name})"
+                    if v == LATEST_RUN
+                    else Path(v).name
+                ),
+                help="Every pipeline run writes its own timestamped folder. "
+                "Leave this on Latest run to follow new runs as they "
+                "finish, or pin an earlier one to browse it.",
             )
             st.caption(f"{len(_runs)} run(s) in {runs_root()}")
         else:
