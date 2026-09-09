@@ -2262,11 +2262,15 @@ def process_pdf(client: Any, pdf_path: Path):
 # ======================================================================================
 # 8) Main
 # ======================================================================================
-def main():
-    """Run Phase 1 over every kept PDF and write per-PDF figure JSON.
+def main(pdf_dir=None):
+    """Run Phase 1 over every input PDF and write per-PDF figure JSON.
 
-    Reads PDFs from PHASE1_INPUT_PDF_DIR (Phase 0's kept set) and calls
-    process_pdf on each; a failure on one PDF is logged and skipped.
+    `pdf_dir` is the folder to read. pipeline.py passes the folder it already
+    selected (Phase 0's kept set when screening ran, the full download folder
+    when `--skip-screening` was used). When called standalone it defaults to the
+    kept set, falling back to the download folder if the kept set is empty.
+
+    Calls process_pdf on each PDF; a failure on one is logged and skipped.
     """
     # EDIT HERE: ensure you set the correct API key env var for the selected provider
     provider = get_phase1_provider()
@@ -2274,9 +2278,20 @@ def main():
     print(f"[INFO] Phase 1 using provider={provider}, model={model}")
     client = build_client()
 
-    phase1_pdf_dir = (
-        PHASE1_INPUT_PDF_DIR if PHASE1_INPUT_PDF_DIR.exists() else PDF_DIR
-    )
+    # The caller (pipeline.py) already decided which folder to use, based on
+    # whether screening ran this session. Honour that instead of re-deciding --
+    # the two used to disagree, and `--skip-screening` after a run that rejected
+    # everything would crash here on an existing-but-empty phase0_kept_pdfs.
+    if pdf_dir is not None:
+        phase1_pdf_dir = Path(pdf_dir)
+    else:
+        # Standalone use: prefer the kept folder, but only if it actually holds
+        # PDFs -- an empty one means fall back to the full download folder.
+        phase1_pdf_dir = (
+            PHASE1_INPUT_PDF_DIR
+            if list(PHASE1_INPUT_PDF_DIR.rglob("*.pdf"))
+            else PDF_DIR
+        )
     pdfs = sorted(phase1_pdf_dir.rglob("*.pdf"))
     if not pdfs:
         raise FileNotFoundError(
