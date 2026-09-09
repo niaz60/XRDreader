@@ -142,6 +142,13 @@ def _build_parser():
         help="Print the resolved run configuration and exit WITHOUT running "
         "(no API calls, no downloads). Use it to check a command.",
     )
+    ap.add_argument(
+        "--ui",
+        action="store_true",
+        help="Open the web interface in a browser instead of running from "
+        "the command line. Results are written under the current folder, "
+        "the same as a CLI run.",
+    )
     return ap
 
 
@@ -306,9 +313,54 @@ def run():
             raise
 
 
+def launch_ui():
+    """Start the Streamlit web interface.
+
+    Streamlit takes a file path, and the UI ships inside the installed
+    package, so the path is resolved from the module rather than assumed to
+    sit next to the caller. importlib.util.find_spec is used instead of an
+    import because importing webapp would execute its Streamlit calls outside
+    a Streamlit runtime and emit a wall of context warnings.
+
+    The child inherits the current working directory, so a UI run writes its
+    output folder in the same place a CLI run would.
+    """
+    import importlib.util
+    import shutil
+    import subprocess
+    import sys
+
+    spec = importlib.util.find_spec("diffai.eraf4xrd.webapp")
+    if spec is None or not spec.origin:
+        raise SystemExit(
+            "Could not locate the web interface (diffai.eraf4xrd.webapp). "
+            "Try reinstalling the package."
+        )
+
+    if shutil.which("streamlit") is None and not importlib.util.find_spec(
+        "streamlit"
+    ):
+        raise SystemExit(
+            "Streamlit is not installed. Install it with: "
+            "pip install streamlit"
+        )
+
+    print(f"Starting the ERAF4XRD web interface from {os.getcwd()}")
+    print("Press Ctrl+C in this terminal to stop it.")
+    try:
+        return subprocess.call(
+            [sys.executable, "-m", "streamlit", "run", spec.origin],
+            cwd=os.getcwd(),
+        )
+    except KeyboardInterrupt:
+        return 0
+
+
 def main():
     """Console entry point (diffai-eraf4xrd): parse flags, then run."""
     args = _apply_cli_flags()
+    if args.ui:
+        raise SystemExit(launch_ui())
     if args.dry_run:
         _print_dry_run()
     else:

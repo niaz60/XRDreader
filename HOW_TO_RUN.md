@@ -56,6 +56,24 @@ By default it downloads **2 PDFs** from arXiv and **only screens them** for XRD 
 
 ---
 
+## Web interface
+
+Everything above is also available in a browser:
+
+```bash
+diffai-eraf4xrd --ui
+```
+
+It opens at http://localhost:8501. Run it from the folder you want results
+written to -- the UI writes its output folder in the working directory, the
+same as a command-line run, and its **Browse files** and **JSON outputs**
+tabs read from there. Press Ctrl+C in the terminal to stop it.
+
+The interface needs Streamlit, which is installed with the package. CIF
+export and Materials Project lookups additionally need `pip install ".[webapp]"`.
+
+---
+
 ## Configuration
 
 Set your key(s) as environment variables before running. In PowerShell:

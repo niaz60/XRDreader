@@ -37,6 +37,16 @@ Every command is `py -3.13 -m diffai.eraf4xrd.app [options]` (or the installed
 
 ---
 
+## 0. Web interface
+
+```bash
+diffai-eraf4xrd --ui          # open the browser UI instead of running in the terminal
+```
+
+Runs from the current folder, so results land beside a CLI run's output.
+
+---
+
 ## 1. Preview and help
 Check a command without spending anything. `--dry-run` works on every command below.
 
