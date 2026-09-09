@@ -540,7 +540,16 @@ class ToolCaller:
         # Append all output items to history
         for item in output_items:
             try:
-                dumped = item if isinstance(item, dict) else item.model_dump()
+                # by_alias=True emits the wire names the API expects. Some
+                # Responses output fields (e.g. reasoning items' `async`) are
+                # Python-reserved words the SDK stores as `async_`; a plain
+                # model_dump() would echo `async_` back and the API 400s
+                # ("Unknown parameter: input[..].async_. Did you mean 'async'?").
+                dumped = (
+                    item
+                    if isinstance(item, dict)
+                    else item.model_dump(by_alias=True, exclude_none=True)
+                )
                 if isinstance(dumped, dict):
                     dumped.pop("status", None)
                 self._openai_messages.append(dumped)
