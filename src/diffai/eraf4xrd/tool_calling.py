@@ -684,9 +684,13 @@ class ToolCaller:
         if not api_key:
             raise RuntimeError("Missing GEMINI_API_KEY")
 
+        # The key goes in a header, not the ?key= query parameter Google also
+        # accepts: a URL-borne credential is copied into proxy logs, server
+        # access logs and any HTTP error text (a requests HTTPError prints the
+        # full URL), none of which we can scrub.
         url = (
             f"https://generativelanguage.googleapis.com/v1beta/models/"
-            f"{self.model}:generateContent?key={api_key}"
+            f"{self.model}:generateContent"
         )
 
         payload = {
@@ -699,7 +703,7 @@ class ToolCaller:
         if self._system:
             payload["systemInstruction"] = {"parts": [{"text": self._system}]}
 
-        resp = _http_post(url, payload, headers={})
+        resp = _http_post(url, payload, headers={"x-goog-api-key": api_key})
         self._last_resp = resp
 
         # Track usage
