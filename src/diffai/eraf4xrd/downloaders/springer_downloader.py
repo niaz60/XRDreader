@@ -11,6 +11,7 @@ Returns True if at least one PDF was saved.
 
 import contextlib
 import io
+import logging
 import os
 import re
 import time
@@ -39,6 +40,56 @@ from diffai.eraf4xrd.utils import (
     log,
     log_download,
 )
+
+# springernature_api_client leaks the API key through its logging in two
+# ways: it logs every request at INFO with the params dict (which contains
+# api_key), and it logs failures at ERROR with the full request URL (which
+# carries api_key in the query string). Its logging_config also calls
+# logging.basicConfig at import, attaching a console handler and an
+# api_client.log file handler to the ROOT logger.
+#
+# Raising the level alone is not enough -- it would either leave the ERROR
+# path leaking or hide genuine errors -- so every record is passed through a
+# filter that redacts the key instead. Our own log() does not use the logging
+# module, so nothing of ours is affected.
+
+
+class _RedactAPIKey(logging.Filter):
+    """Replace the Springer key with a placeholder in any log record."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        key = SPRINGER_API_KEY
+        if not key:
+            return True
+        try:
+            message = record.getMessage()
+        except Exception:
+            return True
+        if key in message:
+            # Collapse args into the message so the redaction cannot be
+            # undone by later %-formatting.
+            record.msg = message.replace(key, "<SPRINGER_API_KEY redacted>")
+            record.args = ()
+        return True
+
+
+_redactor = _RedactAPIKey()
+logging.getLogger("api_client").addFilter(_redactor)
+for _handler in list(logging.getLogger().handlers):
+    _handler.addFilter(_redactor)
+    _target = getattr(_handler, "baseFilename", "")
+    if isinstance(_handler, logging.FileHandler) and _target.endswith(
+        "api_client.log"
+    ):
+        # Detach the stray log file the client drops in the working
+        # directory, and remove it if nothing was written to it.
+        logging.getLogger().removeHandler(_handler)
+        try:
+            _handler.close()
+            if os.path.exists(_target) and os.path.getsize(_target) == 0:
+                os.remove(_target)
+        except Exception:
+            pass
 
 
 # Springer search query (converts the config keywords into Springer API query format)
