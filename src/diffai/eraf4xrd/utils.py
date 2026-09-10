@@ -137,14 +137,50 @@ def set_log_file(fh):
 # -------------------------------------------------------------------
 # LOGGING (WINDOWS/UNICODE SAFE)
 # -------------------------------------------------------------------
+# Credentials that must never reach a log file or the console. Read from the
+# environment at call time rather than from config, so a key set later (for
+# example by the web UI before it launches a run) is still covered, and so
+# utils does not depend on config being imported first.
+_SECRET_ENV_VARS = (
+    "OPENAI_API_KEY",
+    "GEMINI_API_KEY",
+    "ANTHROPIC_API_KEY",
+    "XAI_API_KEY",
+    "TOGETHER_API_KEY",
+    "SPRINGER_API_KEY",
+    "ELSEVIER_API_KEY",
+)
+
+
+def redact_secrets(message: str) -> str:
+    """Replace any configured API key appearing in *message*.
+
+    Third-party libraries put credentials into their own error text -- the
+    Springer client logs the request params, and a requests HTTPError carries
+    the full URL including the api_key query parameter. Logging such an
+    exception wrote the caller's key into the run log, so every line is
+    scrubbed here rather than at each call site.
+    """
+    if not message:
+        return message
+    for name in _SECRET_ENV_VARS:
+        value = os.environ.get(name)
+        # 8 characters guards against a short or placeholder value matching
+        # ordinary words in the message.
+        if value and len(value) >= 8 and value in message:
+            message = message.replace(value, f"<{name} redacted>")
+    return message
+
+
 def log(message: str):
     """Print and (if a log file is open) record one timestamped line.
 
     Windows/Unicode-safe: if a character can't be encoded, it retries with an
-    ASCII-replaced copy instead of crashing the run.
+    ASCII-replaced copy instead of crashing the run. API keys are redacted
+    before anything is written.
     """
     ts = datetime.now().strftime("%H:%M:%S")
-    line = f"[{ts}] {message}"
+    line = f"[{ts}] {redact_secrets(str(message))}"
 
     try:
         print(line)
