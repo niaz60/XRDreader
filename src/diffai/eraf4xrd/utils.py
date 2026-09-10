@@ -149,6 +149,11 @@ _SECRET_ENV_VARS = (
     "TOGETHER_API_KEY",
     "SPRINGER_API_KEY",
     "ELSEVIER_API_KEY",
+    "MP_API_KEY",
+    # Not a credential, but Unpaywall takes it as a URL query parameter, so
+    # it lands in request URLs and error text like a key would. It is the
+    # user's personal address and does not belong in a shared log.
+    "UNPAYWALL_EMAIL",
 )
 
 
