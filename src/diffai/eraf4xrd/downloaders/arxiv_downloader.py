@@ -9,6 +9,7 @@ a broken download and removed. Returns True if at least one PDF was saved.
 """
 
 import os
+import re
 import time
 
 import requests
@@ -28,8 +29,46 @@ from diffai.eraf4xrd.utils import (
     make_pdf_safe_title,
 )
 
-
 # main function (returns 'true' if at least 1 pdf is downloaded/counted, 'false' if none/failed)
+
+# arXiv's Atom API -- which the `arxiv` package wraps -- carries no licence
+# field at all (its entries expose only title, authors, summary, categories,
+# links and friends). Reading result.license therefore always produced an
+# empty string, so REQUIRE_CC_LICENSE silently skipped every arXiv paper.
+# OAI-PMH is the interface that does publish it.
+_OAI = "https://export.arxiv.org/oai2"
+_LICENSE_RE = re.compile(r"<license>(.*?)</license>", re.S)
+
+
+def fetch_arxiv_license(arxiv_id: str, timeout: int = 20):
+    """Return the licence URL arXiv records for a paper, or None.
+
+    None means 'could not determine', which is deliberately distinct from
+    'not Creative Commons' -- the caller must not treat a lookup failure as a
+    licensing decision.
+    """
+    bare = (arxiv_id or "").split("/")[-1].strip()
+    bare = re.sub(r"v\d+$", "", bare)  # OAI wants the version-less id
+    if not bare:
+        return None
+    try:
+        r = requests.get(
+            _OAI,
+            params={
+                "verb": "GetRecord",
+                "identifier": f"oai:arXiv.org:{bare}",
+                "metadataPrefix": "arXiv",
+            },
+            timeout=timeout,
+        )
+        if r.status_code != 200:
+            return None
+        m = _LICENSE_RE.search(r.text)
+        return m.group(1).strip() if m else None
+    except Exception:
+        return None
+
+
 def download_arxiv_pdfs() -> bool:
     """
     Downloads PDFs directly from arXiv using the official `arxiv` library.
@@ -68,17 +107,22 @@ def download_arxiv_pdfs() -> bool:
                 -1
             ]  # extracts the arXiv ID from paper URL (tries to)
 
-            # CC license filtering (if not found: ignore)
+            # CC licence filtering. Note that arXiv's default licence is
+            # nonexclusive-distrib, not Creative Commons, so most papers are
+            # expected to fail this filter -- authors have to opt in to CC.
             if REQUIRE_CC_LICENSE:
-                arxiv_license = (
-                    getattr(result, "license", None) or ""
-                ).lower()
-                if (
-                    "creativecommons" not in arxiv_license
-                    and "/cc/" not in arxiv_license
-                ):
+                arxiv_license = fetch_arxiv_license(arxiv_id)
+                if arxiv_license is None:
                     log(
-                        f"Skipping arXiv {arxiv_id}: no CC license (license={arxiv_license or 'none'})"
+                        f"Skipping arXiv {arxiv_id}: licence could not be "
+                        "determined (OAI-PMH lookup failed)"
+                    )
+                    continue
+                low = arxiv_license.lower()
+                if "creativecommons" not in low and "/cc/" not in low:
+                    log(
+                        f"Skipping arXiv {arxiv_id}: not CC "
+                        f"(licence={arxiv_license})"
                     )
                     continue
 
