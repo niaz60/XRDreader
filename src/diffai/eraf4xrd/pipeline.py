@@ -121,7 +121,13 @@ def _consolidate_phase0():
         for p0_file in sorted(folder.glob("*__phase0.json")):
             try:
                 data = json.loads(p0_file.read_text(encoding="utf-8"))
-                data["_decision"] = decision
+                # Errored PDFs are written to the reject folder, so the
+                # folder alone cannot tell a rejection from a failure. Trust
+                # the recorded decision and fall back to the folder label.
+                recorded = (data.get("decision") or {}).get("decision")
+                data["_decision"] = (
+                    recorded.upper() if recorded else decision
+                )
                 data["_source_file"] = p0_file.name
                 results.append(data)
             except Exception:
@@ -145,6 +151,9 @@ def _consolidate_phase0():
                     ),
                     "rejected": sum(
                         1 for r in results if r["_decision"] == "REJECT"
+                    ),
+                    "errors": sum(
+                        1 for r in results if r["_decision"] == "ERROR"
                     ),
                     "results": results,
                 },
@@ -324,7 +333,14 @@ def pipeline():
             )
             from diffai.eraf4xrd import phase_0_download_filter as phase0
 
-            phase0.main()
+            try:
+                phase0.main()
+            except Exception:
+                # Phase 0 raises when it could not screen anything. Write the
+                # consolidated summary first so the per-PDF errors are still
+                # readable, then let the failure propagate.
+                _consolidate_phase0()
+                raise
         else:
             log("No PDFs found. Skipping Phase 0.")
     else:

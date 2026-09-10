@@ -866,11 +866,15 @@ def main():
     mode = "agentic" if ENABLE_AGENTIC_PHASE0 else "single-shot"
     log(f"Phase 0 mode: {mode}")
 
+    errors = 0
+    screened = 0
+
     for pdf_path in sorted(PDF_DIR.rglob("*.pdf")):
         if not pdf_path.exists():
             continue
 
         log(f"Phase 0 screening: {pdf_path.name}")
+        screened += 1
 
         cached = _load_cached(pdf_path, model)
         try:
@@ -886,13 +890,19 @@ def main():
         except Exception as e:
             friendly = humanize_llm_error(e)
             log(f"[phase0] screening error for {pdf_path.name}: {friendly}")
+            # 'error' is deliberately not 'reject'. A missing or invalid API
+            # key raises here for every PDF, and recording that as a screening
+            # decision produced a run that rejected the whole corpus, wrote a
+            # plausible consolidated log and exited 0 -- an infrastructure
+            # failure indistinguishable from a scientific result.
             result = {
-                "decision": "reject",
+                "decision": "error",
                 "confidence": 0.0,
                 "reason": f"Phase 0 screening error: {friendly}",
                 "agent_trace": [],
                 "steps_used": 0,
             }
+            errors += 1
 
         keep = result["decision"] == "keep"
         out_dir = PHASE0_KEEP_DIR if keep else PHASE0_REJECT_DIR
@@ -928,6 +938,19 @@ def main():
             f"confidence={result['confidence']:.2f} | "
             f"steps={result.get('steps_used', 0)} | "
             f"reason={result['reason']}"
+        )
+
+    if errors:
+        log(f"Phase 0: {errors} of {screened} PDF(s) could not be screened.")
+    if screened and errors == screened:
+        # Every single PDF failed, so this is the pipeline's own problem --
+        # almost always a missing or invalid API key -- not a property of the
+        # corpus. Fail loudly instead of reporting a clean run with nothing
+        # kept.
+        raise RuntimeError(
+            f"Phase 0 failed on all {screened} PDF(s); no document could be "
+            "screened. Check the API key and model for the selected "
+            "provider. See the log above for the underlying error."
         )
 
 
