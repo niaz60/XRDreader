@@ -23,10 +23,21 @@ def get_int(name, default):
     val = os.environ.get(name)
     if val is None or str(val).strip() == "":
         return default
+    text = str(val).strip().lower()
+    # The source switches (USE_ARXIV and friends) are ints, but they read as
+    # on/off, so people write --set USE_SPRINGER=true. Accept the same words
+    # get_bool does rather than silently falling back to the default, which
+    # left the source disabled with no warning.
+    if text in {"1", "true", "yes", "on"}:
+        return 1
+    if text in {"0", "false", "no", "off"}:
+        return 0
     try:
-        return int(float(val))
+        return int(float(text))
     except (ValueError, TypeError):
-        return default
+        raise SystemExit(
+            f"{name}={val!r} is not a number or a true/false value."
+        )
 
 
 # ======================================================================================
