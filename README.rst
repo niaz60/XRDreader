@@ -36,6 +36,25 @@
 .. |Tracking| image:: https://img.shields.io/badge/issue_tracking-github-blue
         :target: https://github.com/diffractionai/diffai.xrdreader/issues
 
+.. important::
+
+   **ERAF4XRD is a component of DiffAI** and is being integrated under the ``diffai``
+   namespace. This repository is the working copy while that integration is in progress,
+   which is why the package is named ``diffai.eraf4xrd`` and why some links below still
+   point at the DiffAI project.
+
+   **To install and run ERAF4XRD, do not follow the conda-forge or PyPI commands in the
+   Installation section below** — the package is not published to those channels yet,
+   so they will fail. Install from source instead, and use the ERAF4XRD guides:
+
+   * `TUTORIAL.md <TUTORIAL.md>`_ — step by step from a bare computer to your first
+     results, assuming no command-line experience.
+   * `HOW_TO_RUN.md <HOW_TO_RUN.md>`_ — the short reference: install, run, options,
+     troubleshooting.
+   * `CLI_REFERENCE.md <CLI_REFERENCE.md>`_ — every flag and combination.
+
+   The rest of this page is the standard DiffAI package description.
+
 Multi-step agentic framework for extracting powder X-ray diffraction (XRD) data — figures and metadata — from scientific literature.
 
 ERAF4XRD downloads open-access papers, screens them for XRD relevance, detects and classifies
@@ -50,7 +69,7 @@ Citation
 
 If you use diffai.eraf4xrd in a scientific publication, we would like you to cite this package as
 
-        diffai.eraf4xrd Package, https://github.com/diffractionai/diffai.xrdreader
+        ERAF4XRD (diffai.eraf4xrd) Package, https://github.com/niaz60/ERAF4XRD
 
 Installation
 ------------
