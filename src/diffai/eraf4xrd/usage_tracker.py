@@ -144,7 +144,7 @@ class UsageTracker:
             "total_tokens": total_tokens,
             "cost_usd": round(cost, 6),
             "wall_seconds": round(wall_seconds, 3),
-            "pdf_name": pdf_name,
+            "pdf_name": pdf_name or _current_pdf,
             "tool_name": tool_name,
             "timestamp": datetime.now().isoformat(),
         }
@@ -246,6 +246,23 @@ class UsageTracker:
 # Global singleton — OUTSIDE the class, at module level
 # ---------------------------------------------------------------------------
 _global_tracker = None
+
+# Name of the PDF currently being processed. Phases that work one document
+# at a time set this once, and log_call() attributes every call made while
+# it is set -- including calls several layers down in an agentic loop, which
+# have no access to the document being worked on.
+_current_pdf = ""
+
+
+def set_current_pdf(name: str = ""):
+    """Attribute subsequent LLM calls to `name`. Call with no argument to clear."""
+    global _current_pdf
+    _current_pdf = name or ""
+
+
+def get_current_pdf() -> str:
+    """The PDF subsequent calls are attributed to, or "" if none is set."""
+    return _current_pdf
 
 
 def set_tracker(t):

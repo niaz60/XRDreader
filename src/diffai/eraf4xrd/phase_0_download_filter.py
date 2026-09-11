@@ -507,7 +507,7 @@ def run_phase0_agent(client: Any, pdf_path: Path) -> Dict:
                 input_tokens=usage["input_tokens"],
                 output_tokens=usage["output_tokens"],
                 wall_seconds=elapsed,
-                pdf_name=pdf_path.name,
+                pdf_name=f"{make_safe_stem(pdf_path.stem)}.pdf",
             )
 
             if not tool_calls:
@@ -743,7 +743,7 @@ def screen_pdf_single_shot(pdf_path: Path) -> Dict:
             input_tokens=usage["input_tokens"],
             output_tokens=usage["output_tokens"],
             wall_seconds=elapsed,
-            pdf_name=pdf_path.name,
+            pdf_name=f"{make_safe_stem(pdf_path.stem)}.pdf",
         )
 
         raw = text_response or ""

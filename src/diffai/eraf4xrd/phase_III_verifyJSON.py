@@ -2392,6 +2392,10 @@ def verify_one_clean_json(input_clean_json: Path):
     if not pdf_path:
         raise ValueError(f"Missing pdf path in clean JSON: {input_clean_json}")
 
+    from diffai.eraf4xrd.usage_tracker import set_current_pdf
+
+    set_current_pdf(Path(str(pdf_path)).name)
+
     pages_text = read_pdf_pages(pdf_path)
 
     # Derive the crop directory from the PDF path (Phase I saves crops here)
@@ -2532,6 +2536,10 @@ def main():
             verify_one_clean_json(input_clean_json)
         except Exception as e:
             print(f"[FAIL] {input_clean_json.name}: {repr(e)}")
+
+    from diffai.eraf4xrd.usage_tracker import set_current_pdf as _clear_pdf
+
+    _clear_pdf()
 
 
 if __name__ == "__main__":

@@ -2078,6 +2078,10 @@ def enrich_one_phase1_json(phase1_json_path: Path):
     pdf_path = resolve_pdf_path(phase1["pdf"], phase1_json_path)
     phase1["pdf_resolved"] = str(pdf_path)
 
+    from diffai.eraf4xrd.usage_tracker import set_current_pdf
+
+    set_current_pdf(pdf_path.name)
+
     # pdfplumber cache (kept for global full-text extraction)
     page_cache: Dict[int, Tuple[List[str], List[str], str]] = {}
     pages_text: List[str] = []
@@ -2302,6 +2306,10 @@ def main():
 
             print(f"[FAIL] {p1.name}: {repr(e)}")
             traceback.print_exc()
+
+    from diffai.eraf4xrd.usage_tracker import set_current_pdf as _clear_pdf
+
+    _clear_pdf()
 
 
 if __name__ == "__main__":

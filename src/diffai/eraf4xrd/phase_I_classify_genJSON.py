@@ -2035,6 +2035,10 @@ def process_pdf(client: Any, pdf_path: Path):
     highlighted page + crop, run the agent (or a single vision call) to decide
     match / is_xrd, and collect the kept records into `*__phase1_raw.json`.
     """
+    from diffai.eraf4xrd.usage_tracker import set_current_pdf
+
+    set_current_pdf(pdf_path.name)
+
     safe_base = make_safe_stem(pdf_path.stem)
     cand_dir = OUT_ROOT / f"{safe_base}_candidates"
     xrd_dir = OUT_ROOT / f"{safe_base}_xrd"
@@ -2316,6 +2320,10 @@ def main(pdf_dir=None):
 
                 traceback.print_exc()
             continue
+
+    from diffai.eraf4xrd.usage_tracker import set_current_pdf as _clear_pdf
+
+    _clear_pdf()
 
 
 if __name__ == "__main__":
