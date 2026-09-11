@@ -4,8 +4,11 @@ ERAF4XRD reads scientific papers and pulls out their X-ray diffraction data. It 
 papers, picks out the XRD figures, extracts the crystallographic metadata, and checks its
 own answers.
 
+This page starts from nothing and assumes you have not installed anything yet.
+
+- [Before you start](#before-you-start)
 - [Install](#install)
-- [Your first run](#your-first-run)
+- [Preview anything for free](#preview-anything-for-free)
 - [Common things to do](#common-things-to-do)
 - [Where the results go](#where-the-results-go)
 - [Download sources](#download-sources)
@@ -15,94 +18,164 @@ own answers.
 
 ---
 
+## Before you start
+
+Three things. Each is free to install. Skip any you already have.
+
+### 1. conda
+
+Creates a private space for ERAF4XRD and the software it needs, so nothing clashes with the
+rest of your computer.
+
+Get it: <https://docs.conda.io/en/latest/miniconda.html> (Miniconda is the small version and is
+all you need.)
+
+To check it is there, open PowerShell and type:
+
+```bash
+conda --version
+```
+
+You should see something like `conda 25.1.1`.
+
+### 2. git
+
+Downloads the ERAF4XRD code. **Optional** — Step 2 below has a way to do it without git.
+
+Get it: <https://git-scm.com/downloads>
+
+```bash
+git --version
+```
+
+### 3. An AI key
+
+ERAF4XRD uses an AI model to read the papers, so you need an account with one provider. You
+only need **one** of these:
+
+| Provider | Where to get a key |
+|---|---|
+| OpenAI — the default | <https://platform.openai.com/api-keys> |
+| Google Gemini | <https://aistudio.google.com/app/apikey> |
+| Anthropic Claude | <https://console.anthropic.com/settings/keys> |
+
+These are paid services, but a first test run costs well under a dollar. Your key is a long
+string that starts with something like `sk-`. Keep it private.
+
+---
+
 ## Install
 
-You need **conda** (also called Anaconda or Miniconda). If you do not have it, install
-Miniconda first: <https://docs.conda.io/en/latest/miniconda.html>.
-It is free, and it is what makes Step 2 work.
+Ten steps, done once. Type or paste one line at a time.
 
-Then do these five steps once, in order.
+**Step 1 — open PowerShell.**
 
-**Step 1 — open a terminal in the ERAF4XRD folder.**
+Press the Windows key, type `powershell`, press Enter. A blue window opens. Every command below
+goes in this window.
 
-That is the folder you downloaded — the one this file is sitting in. In Windows Explorer, go
-into that folder, then hold **Shift** and right-click on empty space and choose
-*Open PowerShell window here*.
+**Step 2 — download the code.**
 
-**Step 2 — create an environment and switch to it.**
+```bash
+cd C:\
+git clone https://github.com/diffractionai/diffai.xrdreader.git
+```
+
+*No git?* Open <https://github.com/diffractionai/diffai.xrdreader> in your browser, click the
+green **Code** button, choose **Download ZIP**, and unzip it into `C:\`. Then carry on.
+
+**Step 3 — go into the folder you just downloaded.**
+
+```bash
+cd C:\diffai.xrdreader
+```
+
+If you used the ZIP, the folder is probably called `diffai.xrdreader-main`, so use that name
+instead.
+
+**Step 4 — create the environment.**
 
 ```bash
 conda create -n eraf4xrd python=3.13 -y
+```
+
+This takes a minute or two. You only ever do it once.
+
+**Step 5 — switch on the environment.**
+
+```bash
 conda activate eraf4xrd
 ```
 
-An environment is a private space for ERAF4XRD and the other software it needs, so it cannot
-clash with anything else on your computer. You create it once; you switch it on every time.
+Your prompt now starts with `(eraf4xrd)`. That is how you know it worked.
 
-**Step 3 — install ERAF4XRD.**
+**Step 6 — install ERAF4XRD.**
 
 ```bash
 pip install .
 ```
 
-The `.` means *the folder I am in right now*, which is why Step 1 matters.
+The `.` means *the folder I am in right now* — which is why Steps 2 and 3 mattered. This prints
+a lot of text and takes a few minutes.
 
-**Step 4 — check it worked.**
+**Step 7 — check it worked.**
 
 ```bash
 diffai-eraf4xrd --help
 ```
 
-If a list of options prints, you are ready.
+If a list of options prints, the install succeeded.
 
-**Step 5 — make a folder for your results and go there.**
+**Step 8 — give it your AI key.**
+
+Paste your own key in place of the `sk-...`:
+
+```bash
+$env:OPENAI_API_KEY="sk-..."
+```
+
+**Step 9 — make a folder to keep your results in, and go there.**
 
 ```bash
 mkdir C:\my_xrd_work
 cd C:\my_xrd_work
 ```
 
-From here on you can be in any folder you like — you never need to go back to the ERAF4XRD
-folder. Results are saved wherever you happen to be, so it is worth having a folder for them.
+Results are saved wherever you are standing, so it is worth having a folder for them. From here
+on you never need to go back to the ERAF4XRD folder.
 
-> **Every new terminal needs `conda activate eraf4xrd` first.** If you close the terminal and
-> open a new one, run that one line again before anything else. Everything below assumes it.
->
-> Use `diffai-eraf4xrd ...` (or `python -m diffai.eraf4xrd.app ...`). Do **not** use the Windows
-> launcher `py -3.13 ...` — it ignores the environment you just switched on and reports
-> `ModuleNotFoundError: No module named 'diffai.eraf4xrd'` even after a successful install.
-
----
-
-## Your first run
-
-**1. Set your AI key.** In PowerShell:
-
-```bash
-$env:OPENAI_API_KEY="sk-..."
-```
-
-One AI key is all you need to start. OpenAI, Gemini, Anthropic, xAI or Together all work —
-see [Download sources](#download-sources) if you want papers from somewhere other than arXiv.
-
-**2. Preview it first — this is free.**
-
-```bash
-diffai-eraf4xrd --full-run --sources arxiv -n 1 --dry-run
-```
-
-`--dry-run` prints what *would* happen — which steps run, which model, where results go — then
-stops. No downloads, no API calls, no cost. You can add it to any command on this page.
-
-**3. Run it for real.**
+**Step 10 — run it.**
 
 ```bash
 diffai-eraf4xrd --full-run --sources arxiv -n 1
 ```
 
 This downloads one arXiv paper about copper and XRD, screens it, finds the XRD figures,
-extracts the metadata and validates it. Expect about **2 minutes** and roughly **$0.30**. Add
-`--model gpt-4.1-mini` to bring that under $0.10 while you are experimenting.
+extracts the metadata and validates it. Expect **2 to 3 minutes** and **$0.25 to $0.35**,
+depending on the paper.
+
+When it finishes, look in `C:\my_xrd_work\eraf4xrd_output\` for a folder named with today's
+date and time.
+
+> **Opening a new PowerShell window later?** You must redo two of these steps, because they do
+> not carry over: `conda activate eraf4xrd` (Step 5) and `$env:OPENAI_API_KEY="..."` (Step 8).
+> Steps 1-4, 6 and 7 are done for good.
+>
+> Use `diffai-eraf4xrd ...` (or `python -m diffai.eraf4xrd.app ...`). Do **not** use the Windows
+> launcher `py -3.13 ...` — it ignores the environment you switched on and reports
+> `ModuleNotFoundError: No module named 'diffai.eraf4xrd'` even after a successful install.
+
+---
+
+## Preview anything for free
+
+Add `--dry-run` to any command on this page. It prints what *would* happen — which steps run,
+which model, where results go — then stops. No downloads, no AI calls, no cost.
+
+```bash
+diffai-eraf4xrd --full-run --sources arxiv -n 1 --dry-run
+```
+
+Use it whenever you are unsure what a command will do.
 
 ---
 
@@ -130,7 +203,7 @@ Two things worth knowing:
 
 ## Where the results go
 
-Every run creates its own dated folder in whatever directory you ran the command from, so runs
+Every run creates its own dated folder inside whatever directory you were standing in, so runs
 never overwrite each other:
 
 ```
@@ -160,8 +233,8 @@ Running a later step on its own in a fresh folder will find nothing to work on �
 
 ## Download sources
 
-arXiv is fully open and needs no credential, which makes it the best place to start. The others
-each need their own:
+arXiv is fully open and needs nothing extra, which makes it the best place to start. The other
+sources each need their own credential:
 
 | `--sources` value | What you need |
 |---|---|
@@ -175,10 +248,10 @@ $env:UNPAYWALL_EMAIL="you@email.com"
 $env:SPRINGER_API_KEY="..."
 ```
 
-You can combine them: `--sources arxiv,crossref`.
+You can combine sources: `--sources arxiv,crossref`.
 
-> Instead of setting it with `$env:...` you can pass any setting on the command line, for example
-> `--set UNPAYWALL_EMAIL=you@email.com`.
+> Instead of setting it with `$env:...` you can pass any setting on the command line, for
+> example `--set UNPAYWALL_EMAIL=you@email.com`.
 
 ---
 
@@ -241,14 +314,16 @@ for step 1.
 
 | You see… | What it means | What to do |
 |---|---|---|
-| `ModuleNotFoundError: No module named 'diffai.eraf4xrd'` | You used `py -3.13`, or the environment is not active | Run `conda activate eraf4xrd`, then use `diffai-eraf4xrd ...` |
-| `Missing API key(s) for the steps this run would execute` | A step that is switched on has no key | Set the key it names, or use `--steps download` to run without AI |
-| `ERROR: ... ipykernel ... requires tornado` during install | Something unrelated in your environment is incomplete — not ERAF4XRD | Ignore it. The line after it says `Successfully installed`. `pip install tornado` silences it |
+| `conda : The term 'conda' is not recognized` | conda is not installed, or PowerShell cannot see it | Install Miniconda (see [Before you start](#before-you-start)), then close and reopen PowerShell |
+| `git : The term 'git' is not recognized` | git is not installed | Install it, or use the Download ZIP route in Step 2 |
+| `ModuleNotFoundError: No module named 'diffai.eraf4xrd'` | You used `py -3.13`, or you forgot `conda activate eraf4xrd` | Run `conda activate eraf4xrd`, then use `diffai-eraf4xrd ...` |
+| `Missing API key(s) for the steps this run would execute` | A step that is switched on has no key | Redo Step 8, or use `--steps download` to run with no AI at all |
+| `ERROR: ... ipykernel ... requires tornado` during install | Something unrelated in your setup is incomplete — not ERAF4XRD | Ignore it. The line after it says `Successfully installed`. `pip install tornado` silences it |
 | `Input validation error` during step 1 | Your model cannot see images | `--set PHASE1_MODEL=gpt-4o` |
 | `non-serverless model ... dedicated endpoint` | That open-source model is not free to call on your account | Pick a different model, or enable it on together.ai |
 | It prints "Skipping…" and nothing runs | A later step could not find the earlier step's results | Point `-o` at the previous run's folder |
 | It downloads papers when you did not want it to | No `-i` was given, so downloading is on | Use `-i "C:\my\pdfs"` |
-| `[WinError 206] ... filename ... too long` while installing | Your install path exceeds the Windows 260-character limit | Install from a short path such as `C:\xrd`, or enable Windows long paths |
+| `[WinError 206] ... filename ... too long` while installing | Your folder path is over the Windows 260-character limit | Install from a short path such as `C:\xrd`, or turn on Windows long paths |
 | Not sure what a command will do | — | Add `--dry-run` to preview it for free |
 
 ---
