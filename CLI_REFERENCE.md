@@ -1,6 +1,6 @@
 # ERAF4XRD — full CLI reference
 
-Every command is `py -3.13 -m diffai.eraf4xrd.app [options]` (or the installed
+Every command is `diffai-eraf4xrd [options]` (or the installed
 `diffai-eraf4xrd [options]`). This is the complete reference — every flag and every combination.
 
 > **New here?** Start with **[HOW_TO_RUN.md](HOW_TO_RUN.md)** — a short, friendly guide. Come back
@@ -9,7 +9,9 @@ Every command is `py -3.13 -m diffai.eraf4xrd.app [options]` (or the installed
 **Before you start**
 - **Preview any command for free:** add `--dry-run`. It prints the resolved configuration and exits
   — no API calls, no downloads. It works on *every* command in this file. Remove it to run for real.
-- Use **Python 3.12+** (`py -3.13`).
+- Use **Python 3.12+**, with the environment you installed into active (`conda activate …`).
+  Type `diffai-eraf4xrd …` (or `python -m diffai.eraf4xrd.app …`). The Windows launcher
+  `py -3.13` bypasses the active environment and will not find the package.
 - **Results go to a fresh timestamped folder** by default: `eraf4xrd_output/<date>_<time>/`
   (each run is self-contained, with `documents/ · results/ · logs/` inside). Use `-o` to name it.
 - **Set an API key first:** `$env:OPENAI_API_KEY="sk-..."` (PowerShell).
@@ -51,9 +53,9 @@ Runs from the current folder, so results land beside a CLI run's output.
 Check a command without spending anything. `--dry-run` works on every command below.
 
 ```bash
-py -3.13 -m diffai.eraf4xrd.app --help
-py -3.13 -m diffai.eraf4xrd.app --full-run --dry-run
-py -3.13 -m diffai.eraf4xrd.app --full-run -n 5 --sources arxiv,springer --dry-run
+diffai-eraf4xrd --help
+diffai-eraf4xrd --full-run --dry-run
+diffai-eraf4xrd --full-run -n 5 --sources arxiv,springer --dry-run
 ```
 
 ---
@@ -63,26 +65,26 @@ Turn individual pipeline steps on or off.
 
 ```bash
 # default: download + Step 0 only
-py -3.13 -m diffai.eraf4xrd.app
+diffai-eraf4xrd
 
 # everything (download -> Step 0 -> I -> II -> clean -> Step III)
-py -3.13 -m diffai.eraf4xrd.app --full-run
+diffai-eraf4xrd --full-run
 
 # everything, but on PDFs you already have (see section 3)
-py -3.13 -m diffai.eraf4xrd.app --full-run --skip-download
+diffai-eraf4xrd --full-run --skip-download
 
 # download + run everything, but SKIP Step 0 screening (process EVERY downloaded PDF)
-py -3.13 -m diffai.eraf4xrd.app --full-run --skip-screening
+diffai-eraf4xrd --full-run --skip-screening
 
 # just download, no screening (download only)
-py -3.13 -m diffai.eraf4xrd.app --skip-screening
+diffai-eraf4xrd --skip-screening
 
 # explicit subsets via --steps  (names: download,step0,step1,step2,clean,step3)
-py -3.13 -m diffai.eraf4xrd.app --steps download,step0            # just collect + screen
-py -3.13 -m diffai.eraf4xrd.app --steps step1                     # figure ID only
-py -3.13 -m diffai.eraf4xrd.app --steps step1,step2               # figure ID + metadata
-py -3.13 -m diffai.eraf4xrd.app --steps step2,clean,step3         # enrich + clean + validate
-py -3.13 -m diffai.eraf4xrd.app --steps step3                     # re-validate only
+diffai-eraf4xrd --steps download,step0            # just collect + screen
+diffai-eraf4xrd --steps step1                     # figure ID only
+diffai-eraf4xrd --steps step1,step2               # figure ID + metadata
+diffai-eraf4xrd --steps step2,clean,step3         # enrich + clean + validate
+diffai-eraf4xrd --steps step3                     # re-validate only
 ```
 *Later steps read earlier steps' JSON from `results/`. Since each run defaults to a NEW timestamped
 folder, running a later step alone finds nothing — point `-o` at the prior run's folder
@@ -95,10 +97,10 @@ Skip downloading and process a folder you point at (`-i`). Only the PDFs in that
 
 ```bash
 # process every PDF in a folder
-py -3.13 -m diffai.eraf4xrd.app --full-run -i "C:\path\to\my_pdfs"
+diffai-eraf4xrd --full-run -i "C:\path\to\my_pdfs"
 
 # the "3 of 5" case: drop the 3 you want into their own folder, point at it
-py -3.13 -m diffai.eraf4xrd.app --full-run -i "C:\path\to\my_3_pdfs"
+diffai-eraf4xrd --full-run -i "C:\path\to\my_3_pdfs"
 ```
 *`-i` / `--input-dir` auto-skips download; your other PDFs elsewhere stay untouched.*
 
@@ -115,9 +117,9 @@ py -3.13 -m diffai.eraf4xrd.app --full-run -i "C:\path\to\my_3_pdfs"
 `-n` sets how many papers to download **per source**.
 
 ```bash
-py -3.13 -m diffai.eraf4xrd.app --full-run -n 1     # smoke test
-py -3.13 -m diffai.eraf4xrd.app --full-run -n 5
-py -3.13 -m diffai.eraf4xrd.app --full-run -n 50    # large harvest
+diffai-eraf4xrd --full-run -n 1     # smoke test
+diffai-eraf4xrd --full-run -n 5
+diffai-eraf4xrd --full-run -n 50    # large harvest
 ```
 *With 3 sources, `-n 5` = 15 downloads.*
 
@@ -127,12 +129,12 @@ py -3.13 -m diffai.eraf4xrd.app --full-run -n 50    # large harvest
 What to search for — material (`--elements`) and technique (`--technique`), AND-combined.
 
 ```bash
-py -3.13 -m diffai.eraf4xrd.app --full-run --elements "Cu OR Copper"
-py -3.13 -m diffai.eraf4xrd.app --full-run --elements "Mo OR Molybdenum"
-py -3.13 -m diffai.eraf4xrd.app --full-run --elements "Fe OR Cu"
-py -3.13 -m diffai.eraf4xrd.app --full-run --elements ""                       # material-independent (generic)
-py -3.13 -m diffai.eraf4xrd.app --full-run --technique "XRD OR PXRD"
-py -3.13 -m diffai.eraf4xrd.app --full-run --elements "Al alloys" --technique "powder diffraction"
+diffai-eraf4xrd --full-run --elements "Cu OR Copper"
+diffai-eraf4xrd --full-run --elements "Mo OR Molybdenum"
+diffai-eraf4xrd --full-run --elements "Fe OR Cu"
+diffai-eraf4xrd --full-run --elements ""                       # material-independent (generic)
+diffai-eraf4xrd --full-run --technique "XRD OR PXRD"
+diffai-eraf4xrd --full-run --elements "Al alloys" --technique "powder diffraction"
 ```
 
 ---
@@ -141,12 +143,12 @@ py -3.13 -m diffai.eraf4xrd.app --full-run --elements "Al alloys" --technique "p
 Where to fetch PDFs from. Springer and Elsevier need their own API key.
 
 ```bash
-py -3.13 -m diffai.eraf4xrd.app --full-run --sources arxiv
-py -3.13 -m diffai.eraf4xrd.app --full-run --sources springer
-py -3.13 -m diffai.eraf4xrd.app --full-run --sources elsevier
-py -3.13 -m diffai.eraf4xrd.app --full-run --sources crossref
-py -3.13 -m diffai.eraf4xrd.app --full-run --sources arxiv,springer
-py -3.13 -m diffai.eraf4xrd.app --full-run --sources arxiv,springer,elsevier,crossref
+diffai-eraf4xrd --full-run --sources arxiv
+diffai-eraf4xrd --full-run --sources springer
+diffai-eraf4xrd --full-run --sources elsevier
+diffai-eraf4xrd --full-run --sources crossref
+diffai-eraf4xrd --full-run --sources arxiv,springer
+diffai-eraf4xrd --full-run --sources arxiv,springer,elsevier,crossref
 ```
 
 ---
@@ -155,12 +157,12 @@ py -3.13 -m diffai.eraf4xrd.app --full-run --sources arxiv,springer,elsevier,cro
 Switch the AI provider — `gpt`, `gemini`, `claude`, `grok`, or `together`. Each needs its own key.
 
 ```bash
-py -3.13 -m diffai.eraf4xrd.app --full-run --provider gpt
-py -3.13 -m diffai.eraf4xrd.app --full-run --provider gemini --model gemini-2.5-flash
-py -3.13 -m diffai.eraf4xrd.app --full-run --provider claude --model claude-sonnet-4-5
-py -3.13 -m diffai.eraf4xrd.app --full-run --provider grok   --model grok-4.1
+diffai-eraf4xrd --full-run --provider gpt
+diffai-eraf4xrd --full-run --provider gemini --model gemini-2.5-flash
+diffai-eraf4xrd --full-run --provider claude --model claude-sonnet-4-5
+diffai-eraf4xrd --full-run --provider grok   --model grok-4.1
 # open-source models (Llama / Qwen / DeepSeek) via Together AI — needs TOGETHER_API_KEY
-py -3.13 -m diffai.eraf4xrd.app --full-run --provider together --model "meta-llama/Llama-3.3-70B-Instruct-Turbo"
+diffai-eraf4xrd --full-run --provider together --model "meta-llama/Llama-3.3-70B-Instruct-Turbo"
 ```
 *`together` uses Together AI's OpenAI-compatible API — pass the full Together model id as `--model`.*
 
@@ -175,10 +177,10 @@ py -3.13 -m diffai.eraf4xrd.app --full-run --provider together --model "meta-lla
 Same provider, different model — the biggest speed/cost lever.
 
 ```bash
-py -3.13 -m diffai.eraf4xrd.app --full-run --model gpt-5.2        # strongest, slowest
-py -3.13 -m diffai.eraf4xrd.app --full-run --model gpt-4.1        # mid
-py -3.13 -m diffai.eraf4xrd.app --full-run --model gpt-4.1-mini   # fast/cheap (recommended for testing)
-py -3.13 -m diffai.eraf4xrd.app --full-run --model gpt-4.1-nano   # cheapest
+diffai-eraf4xrd --full-run --model gpt-5.2        # strongest, slowest
+diffai-eraf4xrd --full-run --model gpt-4.1        # mid
+diffai-eraf4xrd --full-run --model gpt-4.1-mini   # fast/cheap (recommended for testing)
+diffai-eraf4xrd --full-run --model gpt-4.1-nano   # cheapest
 ```
 
 ---
@@ -187,8 +189,8 @@ py -3.13 -m diffai.eraf4xrd.app --full-run --model gpt-4.1-nano   # cheapest
 Agentic tool-loops (default) vs one AI call per step (much faster, a bit less thorough).
 
 ```bash
-py -3.13 -m diffai.eraf4xrd.app --full-run                       # agentic (ReAct tool loops)
-py -3.13 -m diffai.eraf4xrd.app --full-run --single-pass         # one LLM call per step
+diffai-eraf4xrd --full-run                       # agentic (ReAct tool loops)
+diffai-eraf4xrd --full-run --single-pass         # one LLM call per step
 ```
 
 ---
@@ -197,8 +199,8 @@ py -3.13 -m diffai.eraf4xrd.app --full-run --single-pass         # one LLM call 
 Keep everything, or only Creative-Commons-licensed downloads.
 
 ```bash
-py -3.13 -m diffai.eraf4xrd.app --full-run --sources crossref
-py -3.13 -m diffai.eraf4xrd.app --full-run --sources crossref --cc-only
+diffai-eraf4xrd --full-run --sources crossref
+diffai-eraf4xrd --full-run --sources crossref --cc-only
 ```
 
 ---
@@ -237,26 +239,26 @@ Anything you don't override falls back to the global `--provider`/`--model` (the
 
 ```bash
 # 1) Cheapest sane all-GPT mix: nano to screen, gpt-4o to SEE figures, mini/4.1 for the rest
-py -3.13 -m diffai.eraf4xrd.app --full-run \
+diffai-eraf4xrd --full-run \
   --set PHASE0_MODEL=gpt-4.1-nano --set PHASE1_MODEL=gpt-4o \
   --set PHASE2_MODEL=gpt-4.1-mini --set VERIFY_MODEL=gpt-4.1
 
 # 2) Open-source where you can, cloud only where you must  <-- use this if your Together
 #    account has NO serverless vision. Llama (text) does Steps 0/II; GPT-4o does the
 #    vision Step I + validation.
-py -3.13 -m diffai.eraf4xrd.app --full-run \
+diffai-eraf4xrd --full-run \
   --provider together --model "meta-llama/Llama-3.3-70B-Instruct-Turbo" \
   --set PHASE1_PROVIDER=gpt --set PHASE1_MODEL=gpt-4o \
   --set VERIFY_PROVIDER=gpt --set VERIFY_MODEL=gpt-4o
 
 # 3) Claude overall, Gemini for validation only
-py -3.13 -m diffai.eraf4xrd.app --full-run \
+diffai-eraf4xrd --full-run \
   --provider claude --model claude-sonnet-4-5 \
   --set VERIFY_PROVIDER=gemini --set VERIFY_MODEL=gemini-2.5-flash
 
 # 4) All-Together / all-open-source: ONLY works if your account has serverless VISION.
 #    Put a serverless vision model on Step I (+ Step III); text Llama elsewhere.
-py -3.13 -m diffai.eraf4xrd.app --full-run \
+diffai-eraf4xrd --full-run \
   --provider together --model "meta-llama/Llama-3.3-70B-Instruct-Turbo" \
   --set PHASE1_MODEL="<a serverless vision model on your account>" \
   --set VERIFY_MODEL="<a serverless vision model on your account>"
@@ -265,7 +267,7 @@ py -3.13 -m diffai.eraf4xrd.app --full-run \
 ### Test a Together model BEFORE a full run (serverless check, ~free)
 A 1-token ping tells you instantly whether a model runs on your account:
 ```bash
-py -3.13 -c "import os; from openai import OpenAI; c=OpenAI(api_key=os.environ['TOGETHER_API_KEY'], base_url='https://api.together.xyz/v1'); c.chat.completions.create(model='META/MODEL-ID', messages=[{'role':'user','content':'hi'}], max_tokens=1); print('serverless OK')"
+python -c "import os; from openai import OpenAI; c=OpenAI(api_key=os.environ['TOGETHER_API_KEY'], base_url='https://api.together.xyz/v1'); c.chat.completions.create(model='META/MODEL-ID', messages=[{'role':'user','content':'hi'}], max_tokens=1); print('serverless OK')"
 ```
 `serverless OK` → the model is reachable on your account. A `non-serverless` /
 `model_not_available` error → you'd need a paid dedicated endpoint (or a different model).
@@ -277,10 +279,10 @@ py -3.13 -c "import os; from openai import OpenAI; c=OpenAI(api_key=os.environ['
 `--set` sets any variable in `config.py` directly. Repeatable, applied last.
 
 ```bash
-py -3.13 -m diffai.eraf4xrd.app --full-run --set PHASE3_AGENT_MAX_STEPS=4    # validation budget
-py -3.13 -m diffai.eraf4xrd.app --full-run --set DISABLE_ALL_AGENTS=true     # == --single-pass
-py -3.13 -m diffai.eraf4xrd.app --full-run --set TARGET_DOWNLOADS=3          # == -n 3
-py -3.13 -m diffai.eraf4xrd.app --full-run --set REQUIRE_CC_LICENSE=true     # == --cc-only
+diffai-eraf4xrd --full-run --set PHASE3_AGENT_MAX_STEPS=4    # validation budget
+diffai-eraf4xrd --full-run --set DISABLE_ALL_AGENTS=true     # == --single-pass
+diffai-eraf4xrd --full-run --set TARGET_DOWNLOADS=3          # == -n 3
+diffai-eraf4xrd --full-run --set REQUIRE_CC_LICENSE=true     # == --cc-only
 ```
 
 ---
@@ -290,14 +292,14 @@ Choose the output folder. Default = a fresh timestamped folder, so runs never ov
 
 ```bash
 # default: ./eraf4xrd_output/<date>_<time>/   (auto-isolates every run)
-py -3.13 -m diffai.eraf4xrd.app --full-run -n 1
+diffai-eraf4xrd --full-run -n 1
 
 # custom named root
-py -3.13 -m diffai.eraf4xrd.app --full-run -n 1 -o mo_run
-py -3.13 -m diffai.eraf4xrd.app --full-run -n 1 -o "D:\xrd_results\cu_batch"
+diffai-eraf4xrd --full-run -n 1 -o mo_run
+diffai-eraf4xrd --full-run -n 1 -o "D:\xrd_results\cu_batch"
 
 # re-run a later step on a PREVIOUS run — point -o at that run's folder
-py -3.13 -m diffai.eraf4xrd.app --steps step3 -o eraf4xrd_output\2026-08-07_143045
+diffai-eraf4xrd --steps step3 -o eraf4xrd_output\2026-08-07_143045
 ```
 *Each root contains `documents/ · results/ · logs/`. Different `-o` = a separate, self-contained run.*
 
@@ -309,14 +311,14 @@ back into the SAME folder. Nothing upstream re-runs — no re-download, no re-ex
 
 ```bash
 # 1) Re-validate with the SAME model the run used
-py -3.13 -m diffai.eraf4xrd.app --steps step3 -o "eraf4xrd_output\2026-08-07_144835"
+diffai-eraf4xrd --steps step3 -o "eraf4xrd_output\2026-08-07_144835"
 
 # 2) Second-opinion validator: a DIFFERENT LLM just for Step III (VERIFY_PROVIDER/VERIFY_MODEL)
-py -3.13 -m diffai.eraf4xrd.app --steps step3 -o "eraf4xrd_output\2026-08-07_144835" \
+diffai-eraf4xrd --steps step3 -o "eraf4xrd_output\2026-08-07_144835" \
   --set VERIFY_PROVIDER=claude --set VERIFY_MODEL=claude-sonnet-4-5
 
 # 3) Cheap second-opinion validator (vision-capable — Step III can open figures)
-py -3.13 -m diffai.eraf4xrd.app --steps step3 -o "eraf4xrd_output\2026-08-07_144835" \
+diffai-eraf4xrd --steps step3 -o "eraf4xrd_output\2026-08-07_144835" \
   --set VERIFY_PROVIDER=gemini --set VERIFY_MODEL=gemini-2.5-flash
 ```
 *`--provider/--model` set the default; `VERIFY_*` overrides **just the validator**
@@ -328,7 +330,7 @@ agent may inspect a figure, and a text-only model would `400` if it does.*
 > folder first and validate the copy:
 > ```bash
 > Copy-Item -Recurse "eraf4xrd_output\2026-08-07_144835" "eraf4xrd_output\144835_claudeval"
-> py -3.13 -m diffai.eraf4xrd.app --steps step3 -o "eraf4xrd_output\144835_claudeval" --set VERIFY_PROVIDER=claude --set VERIFY_MODEL=claude-sonnet-4-5
+> diffai-eraf4xrd --steps step3 -o "eraf4xrd_output\144835_claudeval" --set VERIFY_PROVIDER=claude --set VERIFY_MODEL=claude-sonnet-4-5
 > ```
 
 ---
@@ -338,22 +340,22 @@ Useful real-world combinations, copy-paste ready.
 
 ```bash
 # Fast dev iteration (cheapest, quickest)
-py -3.13 -m diffai.eraf4xrd.app --full-run -n 1 --single-pass --model gpt-4.1-mini
+diffai-eraf4xrd --full-run -n 1 --single-pass --model gpt-4.1-mini
 
 # Production-quality harvest into a named folder
-py -3.13 -m diffai.eraf4xrd.app --full-run -n 20 --model gpt-5.2 -o cu_production
+diffai-eraf4xrd --full-run -n 20 --model gpt-5.2 -o cu_production
 
 # Process YOUR own PDFs, full quality
-py -3.13 -m diffai.eraf4xrd.app --full-run -i "C:\path\to\my_pdfs"
+diffai-eraf4xrd --full-run -i "C:\path\to\my_pdfs"
 
 # Fastest-per-paper model (per the paper: Claude Sonnet)
-py -3.13 -m diffai.eraf4xrd.app --full-run -n 5 --provider claude --model claude-sonnet-4-5
+diffai-eraf4xrd --full-run -n 5 --provider claude --model claude-sonnet-4-5
 
 # CC-only large collection from multiple sources
-py -3.13 -m diffai.eraf4xrd.app --full-run -n 50 --sources arxiv,crossref --cc-only -o cc_harvest
+diffai-eraf4xrd --full-run -n 50 --sources arxiv,crossref --cc-only -o cc_harvest
 
 # Mo study, cheap, arxiv only, named run
-py -3.13 -m diffai.eraf4xrd.app --full-run -n 3 --elements "Mo OR Molybdenum" --sources arxiv --model gpt-4.1-mini -o mo_test
+diffai-eraf4xrd --full-run -n 3 --elements "Mo OR Molybdenum" --sources arxiv --model gpt-4.1-mini -o mo_test
 ```
 
 ---
@@ -362,12 +364,12 @@ py -3.13 -m diffai.eraf4xrd.app --full-run -n 3 --elements "Mo OR Molybdenum" --
 These should each print a one-line `error: …` and exit non-zero — handy for testing input validation.
 
 ```bash
-py -3.13 -m diffai.eraf4xrd.app --sources reddit          # unknown source
-py -3.13 -m diffai.eraf4xrd.app --steps bogus             # unknown step
-py -3.13 -m diffai.eraf4xrd.app --provider chatgpt        # invalid provider choice
-py -3.13 -m diffai.eraf4xrd.app --set JUSTAKEY            # --set without '='
-py -3.13 -m diffai.eraf4xrd.app -n five                   # -n not an integer
-py -3.13 -m diffai.eraf4xrd.app --turbo                   # unknown flag
+diffai-eraf4xrd --sources reddit          # unknown source
+diffai-eraf4xrd --steps bogus             # unknown step
+diffai-eraf4xrd --provider chatgpt        # invalid provider choice
+diffai-eraf4xrd --set JUSTAKEY            # --set without '='
+diffai-eraf4xrd -n five                   # -n not an integer
+diffai-eraf4xrd --turbo                   # unknown flag
 ```
 
 ---
@@ -376,5 +378,5 @@ py -3.13 -m diffai.eraf4xrd.app --turbo                   # unknown flag
 Each run is its own timestamped folder, so you rarely need to "reset" — just delete the ones you
 don't want. To clear all runs:
 ```bash
-py -3.13 -c "import shutil; shutil.rmtree('eraf4xrd_output', ignore_errors=True)"
+python -c "import shutil; shutil.rmtree('eraf4xrd_output', ignore_errors=True)"
 ```
