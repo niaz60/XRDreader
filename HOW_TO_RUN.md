@@ -1,61 +1,153 @@
 # How to run ERAF4XRD
 
-ERAF4XRD extracts X-ray diffraction (XRD) data — **figures and metadata** — from scientific PDFs.
-It downloads papers, screens them for XRD content, finds the XRD figures, extracts the metadata,
-links figures to metadata, and automatically double-checks the result.
+ERAF4XRD reads scientific papers and pulls out their X-ray diffraction data. It finds the
+papers, picks out the XRD figures, extracts the crystallographic metadata, and checks its
+own answers.
 
-**Contents**
-- [Installation](#installation)
-- [Quick start](#quick-start)
-- [Configuration](#configuration)
-- [Options](#options)
-- [Examples](#examples)
+- [Install](#install)
+- [Your first run](#your-first-run)
+- [Common things to do](#common-things-to-do)
+- [Where the results go](#where-the-results-go)
+- [Download sources](#download-sources)
+- [Web interface](#web-interface)
+- [All options](#all-options)
 - [Troubleshooting](#troubleshooting)
 
 ---
 
-## Installation
+## Install
 
-Requires **Python 3.12+**. A fresh conda environment is recommended:
+You need Python 3.12 or newer. Run these from the project folder (the one with
+`pyproject.toml` in it):
 
 ```bash
-# 1. create and activate an environment
 conda create -n eraf4xrd python=3.13 -y
 conda activate eraf4xrd
-
-# 2. install ERAF4XRD (run from the project folder, where pyproject.toml lives)
 pip install .
 ```
 
-`pip install .` installs ERAF4XRD with all its dependencies and adds the `diffai-eraf4xrd`
-command. Run it either way — they are identical:
+Check it worked:
 
 ```bash
-diffai-eraf4xrd --help                 # the installed command
-python -m diffai.eraf4xrd.app --help   # the same thing, as a module
+diffai-eraf4xrd --help
 ```
 
-> **Which command to type:** the examples below use the installed `diffai-eraf4xrd …` command,
-> which behaves identically on Windows, macOS and Linux. `python -m diffai.eraf4xrd.app …` is
-> equivalent. Both need the environment you installed into to be active (`conda activate …`).
+If you see the list of options, you are ready.
+
+> **Keep the environment active.** Every command below assumes you have run
+> `conda activate eraf4xrd` in that terminal first. If you open a new terminal, run it again.
 >
-> Do **not** use the Windows launcher (`py -3.13 …`). It ignores the active conda environment
-> and runs the system Python instead, which reports
-> `ModuleNotFoundError: No module named 'diffai.eraf4xrd'` even though the install succeeded.
+> Use `diffai-eraf4xrd ...` (or `python -m diffai.eraf4xrd.app ...`). Do **not** use the Windows
+> launcher `py -3.13 ...` — it ignores the active environment and reports
+> `ModuleNotFoundError: No module named 'diffai.eraf4xrd'` even after a successful install.
 
 ---
 
-## Quick start
+## Your first run
+
+**1. Set your AI key.** In PowerShell:
 
 ```bash
-diffai-eraf4xrd
+$env:OPENAI_API_KEY="sk-..."
 ```
 
-By default it downloads **2 PDFs** from arXiv and **only screens them** for XRD content — it does
-**not** extract figures or metadata. Add options (see [Options](#options)) to do more.
+One AI key is all you need to start. OpenAI, Gemini, Anthropic, xAI or Together all work —
+see [Download sources](#download-sources) if you want papers from somewhere other than arXiv.
 
-> 💡 **Preview any command for free:** add `--dry-run`. It prints what *would* happen — which steps
-> run, which model, where results go — then stops. No downloads, no API calls, no cost.
+**2. Preview it first — this is free.**
+
+```bash
+diffai-eraf4xrd --full-run --sources arxiv -n 1 --dry-run
+```
+
+`--dry-run` prints what *would* happen — which steps run, which model, where results go — then
+stops. No downloads, no API calls, no cost. You can add it to any command on this page.
+
+**3. Run it for real.**
+
+```bash
+diffai-eraf4xrd --full-run --sources arxiv -n 1
+```
+
+This downloads one arXiv paper about copper and XRD, screens it, finds the XRD figures,
+extracts the metadata and validates it. Expect about **2 minutes** and roughly **$0.30**. Add
+`--model gpt-4.1-mini` to bring that under $0.10 while you are experimenting.
+
+---
+
+## Common things to do
+
+| I want to… | Command |
+|---|---|
+| Use PDFs I already have | `diffai-eraf4xrd --full-run -i "C:\my\pdfs"` |
+| Search for a different material | `diffai-eraf4xrd --full-run --elements "Mo OR Molybdenum"` |
+| Get more papers | `diffai-eraf4xrd --full-run -n 5` |
+| Spend less | `diffai-eraf4xrd --full-run --model gpt-4.1-mini` |
+| Go faster and cheaper still | `diffai-eraf4xrd --full-run --single-pass` |
+| Use Claude instead of GPT | `diffai-eraf4xrd --full-run --provider claude --model claude-sonnet-4-5` |
+| Name my own output folder | `diffai-eraf4xrd --full-run -o my_run` |
+| Only download papers, no AI | `diffai-eraf4xrd --steps download` |
+| Keep only Creative-Commons papers | `diffai-eraf4xrd --full-run --cc-only` |
+
+Two things worth knowing:
+
+- `-n` is **per source**, so `-n 5` with two sources downloads 10 papers.
+- `-i` points at a folder of your own PDFs and turns downloading off. To process only some of
+  the PDFs in a folder, put those in their own folder and point `-i` at that.
+
+---
+
+## Where the results go
+
+Every run creates its own dated folder in whatever directory you ran the command from, so runs
+never overwrite each other:
+
+```
+eraf4xrd_output/2026-08-07_143022/
+    documents/   the PDFs it downloaded
+    results/     all the JSON output
+    logs/        the run log
+```
+
+Use `-o my_run` to name the folder yourself.
+
+**To continue an earlier run**, point `-o` at that run's folder. For example, to redo only the
+final validation step:
+
+```bash
+diffai-eraf4xrd --steps step3 -o "eraf4xrd_output\2026-08-07_143022"
+```
+
+The steps run in this order, and each one needs the previous one's results:
+
+**download → step0** (screen) **→ step1** (figures) **→ step2** (metadata) **→ clean → step3** (validate)
+
+Running a later step on its own in a fresh folder will find nothing to work on — that is what
+`-o` is for.
+
+---
+
+## Download sources
+
+arXiv is fully open and needs no credential, which makes it the best place to start. The others
+each need their own:
+
+| `--sources` value | What you need |
+|---|---|
+| `arxiv` | nothing |
+| `crossref` | `UNPAYWALL_EMAIL` — any real email address |
+| `springer` | `SPRINGER_API_KEY` |
+| `elsevier` | `ELSEVIER_API_KEY` |
+
+```bash
+$env:UNPAYWALL_EMAIL="you@email.com"
+$env:SPRINGER_API_KEY="..."
+```
+
+You can combine them: `--sources arxiv,crossref`.
+
+> Instead of setting an environment variable you can pass any setting inline, for example
+> `--set UNPAYWALL_EMAIL=you@email.com`.
 
 ---
 
@@ -67,141 +159,50 @@ Everything above is also available in a browser:
 diffai-eraf4xrd --ui
 ```
 
-It opens at http://localhost:8501. Run it from the folder you want results
-written to -- the UI writes its output folder in the working directory, the
-same as a command-line run, and its **Browse files** and **JSON outputs**
-tabs read from there. Press Ctrl+C in the terminal to stop it.
+It opens at http://localhost:8501. Run it from the folder you want results written to — the UI
+writes its output folder in the current directory just as a command-line run does, and its
+**Browse files** and **JSON outputs** tabs read from there. Press Ctrl+C in the terminal to stop it.
 
-The interface needs Streamlit, which is installed with the package. CIF
-export and Materials Project lookups additionally need `pip install ".[webapp]"`.
-
----
-
-## Configuration
-
-Set your key(s) as environment variables before running. In PowerShell:
-
-```bash
-$env:OPENAI_API_KEY="sk-..."      # required — or a GEMINI / ANTHROPIC / XAI / TOGETHER key
-$env:UNPAYWALL_EMAIL="you@email.com"   # only if you download from CrossRef
-$env:SPRINGER_API_KEY="..."       # only if you download from Springer
-```
-
-You always need **one AI provider key**. Beyond that, **each download source needs its own
-credential** — except **arXiv**, which is fully open:
-
-| `--sources` value | Credential needed |
-|---|---|
-| `arxiv` | none — fully open (best for a quick test) |
-| `crossref` | `UNPAYWALL_EMAIL` — any real email (required by the Unpaywall API) |
-| `springer` | `SPRINGER_API_KEY` |
-| `elsevier` | `ELSEVIER_API_KEY` |
-
-> Tip: instead of setting an environment variable, you can pass any credential inline, e.g.
-> `--set UNPAYWALL_EMAIL=you@email.com`.
+Streamlit is installed with the package. CIF export and Materials Project lookups additionally
+need `pip install ".[webapp]"`.
 
 ---
 
-## Options
+## All options
 
 | Option | What it does |
 |---|---|
-| `--full-run` | Run the whole pipeline: download → screen → figures → metadata → check |
+| `--full-run` | Run everything: download → screen → figures → metadata → validate |
 | `--steps step0,step1` | Run only certain steps (`download,step0,step1,step2,clean,step3`) |
-| `--skip-download` | Skip downloading; use PDFs already in the output folder |
-| `--skip-screening` | Skip Step 0 screening — run the later steps on **every** downloaded PDF |
-| `-i "C:\my\pdfs"` | Use PDFs you already have in a folder (skips downloading) |
+| `--skip-download` | Use PDFs already in the output folder |
+| `--skip-screening` | Skip screening — run later steps on **every** downloaded PDF |
+| `-i "C:\my\pdfs"` | Use PDFs from a folder of your own (turns downloading off) |
 | `-n 5` | How many papers to download per source |
-| `--elements "Cu OR Copper"` | The material / element to search for |
-| `--technique "XRD OR PXRD"` | The technique to search for (AND-combined with `--elements`) |
-| `--sources arxiv` | Where to download from (`arxiv`, `springer`, `elsevier`, `crossref`) |
-| `--cc-only` | Keep only Creative-Commons-licensed downloads |
+| `--elements "Cu OR Copper"` | The material to search for |
+| `--technique "XRD OR PXRD"` | The technique to search for |
+| `--sources arxiv` | Where to download from |
+| `--cc-only` | Keep only Creative-Commons-licensed papers |
 | `--provider gpt` | Which AI provider (`gpt`, `gemini`, `claude`, `grok`, `together`) |
 | `--model gpt-4o` | Which model |
-| `--single-pass` | One AI call per step instead of the agentic loop (faster, cheaper) |
-| `--set KEY=VALUE` | Set any advanced config value directly (repeatable) |
-| `-o "my_run"` | Put results in a folder you name |
-| `--dry-run` | Preview a command without running it (no cost) |
+| `--single-pass` | One AI call per step instead of the agentic loop |
+| `--set KEY=VALUE` | Set any advanced setting directly (repeatable) |
+| `-o my_run` | Name the output folder |
+| `--dry-run` | Preview without running — free |
+| `--ui` | Open the web interface |
 | `--help` | List every option |
 
----
+### Using a different model for each step
 
-## Examples
+You can give each step its own model — a cheap one to screen papers, a stronger one to read
+figures:
 
-### Run the full pipeline
 ```bash
-diffai-eraf4xrd --full-run
+diffai-eraf4xrd --full-run --set PHASE0_MODEL=gpt-4.1-nano --set PHASE1_MODEL=gpt-4o
 ```
 
-### Use PDFs you already have
-Put your PDFs in a folder and point at it — no downloading, only those files get processed.
-```bash
-diffai-eraf4xrd --full-run -i "C:\my\pdfs"
-```
-To run on only some of the PDFs in a folder (say 3 of 5), put those in their own folder and point
-`-i` at it.
-
-### Choose what to download
-```bash
-diffai-eraf4xrd --full-run -n 5 --elements "Mo OR Molybdenum" --sources arxiv
-```
-`-n` is per source — `-n 5` with two sources downloads 10.
-
-### Pick the AI model
-Cheaper/faster for testing, stronger for real runs.
-```bash
-diffai-eraf4xrd --full-run --model gpt-4.1-mini                     # fast & cheap
-diffai-eraf4xrd --full-run --provider claude --model claude-sonnet-4-5
-```
-
-### Run only certain steps
-The steps, in order: **download → step0** (screen) **→ step1** (figures) **→ step2** (data)
-**→ clean → step3** (check).
-```bash
-diffai-eraf4xrd --steps step0,step1
-```
-> Later steps need the earlier steps' results. Each run saves to a **new** folder, so running a
-> later step on its own finds nothing — to continue a previous run, use `-o` (below).
-
-### Where results are saved
-Every run makes its own dated folder, so runs never overwrite each other:
-```
-eraf4xrd_output/2026-08-07_143022/
-    documents/   ← the PDFs
-    results/     ← all the JSON output
-    logs/        ← the run log
-```
-Name the folder yourself instead:
-```bash
-diffai-eraf4xrd --full-run -o cu_run
-```
-
-### Resume a previous run (e.g. re-check only)
-Point `-o` at the earlier run's folder. Example — re-run just the final data-check:
-```bash
-diffai-eraf4xrd --steps step3 -o "eraf4xrd_output\2026-08-07_143022"
-```
-Want a second opinion from a different model? Give that step its own validator:
-```bash
-diffai-eraf4xrd --steps step3 -o "eraf4xrd_output\2026-08-07_143022" \
-  --set VERIFY_PROVIDER=claude --set VERIFY_MODEL=claude-sonnet-4-5
-```
-
-### Mix models across steps
-Give each step its own model — a cheap one to screen, a strong one to read figures. Two rules:
-
-1. **Reading figures needs a model that can *see* images.** Step 1 (and ideally step 3) look at
-   pictures; a text-only model (like Llama-3.3-70B) will error there — use `gpt-4o`, `gemini`,
-   `claude`, or a vision model for step 1.
-2. **Open-source models (via `together`) must be available on your account.** Some require a paid
-   dedicated endpoint. If you see a "non-serverless" error, pick a different model.
-
-A combo that works well — open-source for the text steps, a cloud model for the figure step:
-```bash
-diffai-eraf4xrd --full-run \
-  --provider together --model "meta-llama/Llama-3.3-70B-Instruct-Turbo" \
-  --set PHASE1_PROVIDER=gpt --set PHASE1_MODEL=gpt-4o
-```
+**Step 1 reads pictures, so it needs a model that can see images.** A text-only model such as
+Llama-3.3-70B will fail there. Use `gpt-4o`, a Gemini or Claude model, or another vision model
+for step 1.
 
 ---
 
@@ -209,14 +210,16 @@ diffai-eraf4xrd --full-run \
 
 | You see… | What it means | What to do |
 |---|---|---|
-| `Input validation error` during step 1 | Your model can't see images | Use a vision model for step 1: `--set PHASE1_MODEL=gpt-4o` |
-| `non-serverless model … dedicated endpoint` | That open-source model isn't free-to-call on your account | Pick a different model, or enable it on together.ai |
-| It prints "Skipping…" and nothing runs | A later step couldn't find earlier results | Point `-o` at the previous run's folder |
-| It downloads papers again | No `-i`, and downloading is on | Use `-i "C:\my\pdfs"` to reuse PDFs you already have |
-| `ERROR: UNPAYWALL_EMAIL is not set` (or `..._API_KEY not set`) | That `--sources` choice needs a credential | Set it (see [Configuration](#configuration)) or pass `--set UNPAYWALL_EMAIL=you@email.com`; or use `--sources arxiv` (needs none) |
+| `ModuleNotFoundError: No module named 'diffai.eraf4xrd'` | You used `py -3.13`, or the environment is not active | Run `conda activate eraf4xrd`, then use `diffai-eraf4xrd ...` |
+| `Missing API key(s) for the steps this run would execute` | A step that is switched on has no key | Set the key it names, or use `--steps download` to run without AI |
+| `ERROR: ... ipykernel ... requires tornado` during install | Something unrelated in your environment is incomplete — not ERAF4XRD | Ignore it. The line after it says `Successfully installed`. `pip install tornado` silences it |
+| `Input validation error` during step 1 | Your model cannot see images | `--set PHASE1_MODEL=gpt-4o` |
+| `non-serverless model ... dedicated endpoint` | That open-source model is not free to call on your account | Pick a different model, or enable it on together.ai |
+| It prints "Skipping…" and nothing runs | A later step could not find the earlier step's results | Point `-o` at the previous run's folder |
+| It downloads papers when you did not want it to | No `-i` was given, so downloading is on | Use `-i "C:\my\pdfs"` |
+| `[WinError 206] ... filename ... too long` while installing | Your install path exceeds the Windows 260-character limit | Install from a short path such as `C:\xrd`, or enable Windows long paths |
 | Not sure what a command will do | — | Add `--dry-run` to preview it for free |
-| `[WinError 206] … filename … too long` while installing (Windows only) | Your install folder path exceeds Windows' 260-character limit | Install from a short path like `C:\xrd`, or enable Windows long paths (set `LongPathsEnabled=1`) |
 
 ---
 
-*Want every possible flag and combination? See [CLI_REFERENCE.md](CLI_REFERENCE.md) — the full reference.*
+*Want every flag and combination? See [CLI_REFERENCE.md](CLI_REFERENCE.md).*
