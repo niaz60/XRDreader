@@ -87,16 +87,16 @@ cd C:\
 **3b.** Download ERAF4XRD.
 
 ```
-git clone https://github.com/diffractionai/diffai.xrdreader.git
+git clone https://github.com/niaz60/ERAF4XRD.git
 ```
 
-You should see `Cloning into 'diffai.xrdreader'...` and then a few lines about receiving
+You should see `Cloning into 'ERAF4XRD'...` and then a few lines about receiving
 objects. It takes under a minute.
 
 **3c.** Go into the folder that just appeared.
 
 ```
-cd C:\diffai.xrdreader
+cd C:\ERAF4XRD
 ```
 
 **3d.** Make a private space for ERAF4XRD to live in, so it cannot disturb anything else on

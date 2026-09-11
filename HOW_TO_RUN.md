@@ -32,8 +32,8 @@ Python 3.12+ is required; the install below creates it for you.
 ## Install
 
 ```bash
-git clone https://github.com/diffractionai/diffai.xrdreader.git
-cd diffai.xrdreader
+git clone https://github.com/niaz60/ERAF4XRD.git
+cd ERAF4XRD
 conda create -n eraf4xrd python=3.13 -y
 conda activate eraf4xrd
 pip install .
@@ -43,7 +43,7 @@ pip install .
 To install from anywhere, give the path instead of `.`:
 
 ```bash
-pip install "C:\path\to\diffai.xrdreader"
+pip install "C:\path\to\ERAF4XRD"
 ```
 
 Verify:

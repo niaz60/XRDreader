@@ -1,7 +1,7 @@
 # ERAF4XRD — full CLI reference
 
-Every command is `diffai-eraf4xrd [options]` (or the installed
-`diffai-eraf4xrd [options]`). This is the complete reference — every flag and every combination.
+Every command is `diffai-eraf4xrd [options]` (or, equivalently,
+`python -m diffai.eraf4xrd.app [options]`). This is the complete reference — every flag and every combination.
 
 > **New here?** Start with **[HOW_TO_RUN.md](HOW_TO_RUN.md)** — a short, friendly guide. Come back
 > here when you want the full list of options and combinations.
