@@ -17,13 +17,24 @@ own answers.
 
 ## Install
 
-You need Python 3.12 or newer. Run these from the project folder (the one with
-`pyproject.toml` in it):
+You need Python 3.12 or newer. Make an environment first — you can do this from anywhere:
 
 ```bash
 conda create -n eraf4xrd python=3.13 -y
 conda activate eraf4xrd
+```
+
+Then install ERAF4XRD. The `.` means *the project in this folder*, so run this from the folder
+that holds `pyproject.toml`:
+
+```bash
 pip install .
+```
+
+Or stay where you are and give the path instead of `.`:
+
+```bash
+pip install "C:\path\to\eraf4xrd"
 ```
 
 Check it worked:
@@ -33,6 +44,16 @@ diffai-eraf4xrd --help
 ```
 
 If you see the list of options, you are ready.
+
+> **After installing, run ERAF4XRD from wherever you like** — you do not need to be in the
+> project folder, and normally you should not be. Results are written into the folder you run
+> from, so make a folder for your work and run from there:
+>
+> ```bash
+> mkdir C:\my_xrd_work
+> cd C:\my_xrd_work
+> diffai-eraf4xrd --full-run --sources arxiv -n 1
+> ```
 
 > **Keep the environment active.** Every command below assumes you have run
 > `conda activate eraf4xrd` in that terminal first. If you open a new terminal, run it again.
