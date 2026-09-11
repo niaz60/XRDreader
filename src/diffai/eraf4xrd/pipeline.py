@@ -235,6 +235,65 @@ def _log_agent_config(
         log(f"{agent_name} config -> no LLM used")
 
 
+# Which credential each provider reads. A provider missing from this map is
+# left alone: the stage that uses it raises its own error, and refusing to
+# start on a provider we do not recognise would be worse than running.
+_PROVIDER_KEY_ENV = {
+    "gpt": "OPENAI_API_KEY",
+    "grok": "XAI_API_KEY",
+    "together": "TOGETHER_API_KEY",
+    "gemini": "GEMINI_API_KEY",
+    "claude": "ANTHROPIC_API_KEY",
+}
+
+
+def _check_api_keys_for_enabled_steps():
+    """Fail before downloading when an enabled LLM step has no credential.
+
+    Each step resolves its provider exactly as the run will, so this can
+    never disagree with what actually executes. Steps that are switched off
+    are not checked, which keeps download-only runs working with no key.
+    """
+    stages = (
+        (RUN_PHASE0_FILTER, "Step 0 (screening)", "PHASE0_PROVIDER"),
+        (RUN_PHASE1, "Step I (figure detection)", "PHASE1_PROVIDER"),
+        (RUN_PHASE2, "Step II (metadata extraction)", "PHASE2_PROVIDER"),
+        (RUN_JSON_VERIFY_AGENT, "Step III (validation)", "VERIFY_PROVIDER"),
+    )
+
+    missing = {}
+    for enabled, label, provider_env in stages:
+        if not enabled:
+            continue
+        provider = _env_or_default(provider_env, PROVIDER)
+        key_env = _PROVIDER_KEY_ENV.get(provider)
+        if key_env and not os.environ.get(key_env, "").strip():
+            missing.setdefault(key_env, []).append(
+                f"{label} [provider={provider}]"
+            )
+
+    if not missing:
+        return
+
+    lines = [
+        "Missing API key(s) for the steps this run would execute:",
+        "",
+    ]
+    for key_env, users in missing.items():
+        lines.append(f"  {key_env}")
+        for u in users:
+            lines.append(f"      needed by {u}")
+    lines += [
+        "",
+        "Set them first, for example in PowerShell:",
+        f'  $env:{list(missing)[0]}="..."',
+        "",
+        "Or run only the steps that need no AI, for example:",
+        "  diffai-eraf4xrd --steps download",
+    ]
+    raise SystemExit("\n".join(lines))
+
+
 def _skip_missing_input(
     step_label: str,
     missing_desc: str,
@@ -284,6 +343,9 @@ def pipeline():
 
     # Feature 1: Save run config snapshot
     _save_run_manifest()
+
+    # Fail now rather than after a download if a step has no credential.
+    _check_api_keys_for_enabled_steps()
 
     # download open-access PDFs from each enabled source
     if RUN_DOWNLOAD:
