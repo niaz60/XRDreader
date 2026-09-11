@@ -17,49 +17,59 @@ own answers.
 
 ## Install
 
-You need Python 3.12 or newer. Make an environment first — you can do this from anywhere:
+You need **conda** (also called Anaconda or Miniconda). If you do not have it, install
+Miniconda first: <https://docs.conda.io/en/latest/miniconda.html>.
+It is free, and it is what makes Step 2 work.
+
+Then do these five steps once, in order.
+
+**Step 1 — open a terminal in the ERAF4XRD folder.**
+
+That is the folder you downloaded — the one this file is sitting in. In Windows Explorer, go
+into that folder, then hold **Shift** and right-click on empty space and choose
+*Open PowerShell window here*.
+
+**Step 2 — create an environment and switch to it.**
 
 ```bash
 conda create -n eraf4xrd python=3.13 -y
 conda activate eraf4xrd
 ```
 
-Then install ERAF4XRD. The `.` means *the project in this folder*, so run this from the folder
-that holds `pyproject.toml`:
+An environment is a private space for ERAF4XRD and the other software it needs, so it cannot
+clash with anything else on your computer. You create it once; you switch it on every time.
+
+**Step 3 — install ERAF4XRD.**
 
 ```bash
 pip install .
 ```
 
-Or stay where you are and give the path instead of `.`:
+The `.` means *the folder I am in right now*, which is why Step 1 matters.
 
-```bash
-pip install "C:\path\to\eraf4xrd"
-```
-
-Check it worked:
+**Step 4 — check it worked.**
 
 ```bash
 diffai-eraf4xrd --help
 ```
 
-If you see the list of options, you are ready.
+If a list of options prints, you are ready.
 
-> **After installing, run ERAF4XRD from wherever you like** — you do not need to be in the
-> project folder, and normally you should not be. Results are written into the folder you run
-> from, so make a folder for your work and run from there:
->
-> ```bash
-> mkdir C:\my_xrd_work
-> cd C:\my_xrd_work
-> diffai-eraf4xrd --full-run --sources arxiv -n 1
-> ```
+**Step 5 — make a folder for your results and go there.**
 
-> **Keep the environment active.** Every command below assumes you have run
-> `conda activate eraf4xrd` in that terminal first. If you open a new terminal, run it again.
+```bash
+mkdir C:\my_xrd_work
+cd C:\my_xrd_work
+```
+
+From here on you can be in any folder you like — you never need to go back to the ERAF4XRD
+folder. Results are saved wherever you happen to be, so it is worth having a folder for them.
+
+> **Every new terminal needs `conda activate eraf4xrd` first.** If you close the terminal and
+> open a new one, run that one line again before anything else. Everything below assumes it.
 >
 > Use `diffai-eraf4xrd ...` (or `python -m diffai.eraf4xrd.app ...`). Do **not** use the Windows
-> launcher `py -3.13 ...` — it ignores the active environment and reports
+> launcher `py -3.13 ...` — it ignores the environment you just switched on and reports
 > `ModuleNotFoundError: No module named 'diffai.eraf4xrd'` even after a successful install.
 
 ---
@@ -167,7 +177,7 @@ $env:SPRINGER_API_KEY="..."
 
 You can combine them: `--sources arxiv,crossref`.
 
-> Instead of setting an environment variable you can pass any setting inline, for example
+> Instead of setting it with `$env:...` you can pass any setting on the command line, for example
 > `--set UNPAYWALL_EMAIL=you@email.com`.
 
 ---
@@ -205,7 +215,7 @@ need `pip install ".[webapp]"`.
 | `--cc-only` | Keep only Creative-Commons-licensed papers |
 | `--provider gpt` | Which AI provider (`gpt`, `gemini`, `claude`, `grok`, `together`) |
 | `--model gpt-4o` | Which model |
-| `--single-pass` | One AI call per step instead of the agentic loop |
+| `--single-pass` | Ask the AI once per step instead of letting it check its own work (faster and cheaper, usually finds a little less) |
 | `--set KEY=VALUE` | Set any advanced setting directly (repeatable) |
 | `-o my_run` | Name the output folder |
 | `--dry-run` | Preview without running — free |
