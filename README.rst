@@ -47,10 +47,10 @@
    Installation section below** — the package is not published to those channels yet,
    so they will fail. Install from source instead, and use the ERAF4XRD guides:
 
-   * `TUTORIAL.md <TUTORIAL.md>`_ — step by step from a bare computer to your first
-     results, assuming no command-line experience.
    * `HOW_TO_RUN.md <HOW_TO_RUN.md>`_ — the short reference: install, run, options,
      troubleshooting.
+   * `TUTORIAL.md <TUTORIAL.md>`_ — step by step from a bare computer to your first
+     results, assuming no command-line experience.
    * `CLI_REFERENCE.md <CLI_REFERENCE.md>`_ — every flag and combination.
 
    The rest of this page is the standard DiffAI package description.
