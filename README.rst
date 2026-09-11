@@ -105,9 +105,13 @@ To view the basic usage and available commands, type ::
 Getting Started
 ---------------
 
-To run the pipeline from the command line, see `HOW_TO_RUN.md <HOW_TO_RUN.md>`_ — a short, friendly
-guide covering install, quick start, and examples — and `CLI_REFERENCE.md <CLI_REFERENCE.md>`_ for
-every flag and command combination.
+New to the command line? Start with `TUTORIAL.md <TUTORIAL.md>`_ — a step-by-step
+walkthrough from a bare computer to your first results, assuming no programming
+experience.
+
+Otherwise see `HOW_TO_RUN.md <HOW_TO_RUN.md>`_ — a short guide covering install,
+first run, and examples — and `CLI_REFERENCE.md <CLI_REFERENCE.md>`_ for every flag
+and command combination.
 
 You may also consult our `online documentation <https://diffractionai.github.io/diffai.xrdreader>`_ for tutorials and API references.
 

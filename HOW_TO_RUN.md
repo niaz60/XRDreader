@@ -6,6 +6,10 @@ own answers.
 
 This page starts from nothing and assumes you have not installed anything yet.
 
+> **Never used a command line before?** Start with **[TUTORIAL.md](TUTORIAL.md)** instead.
+> It walks through the same thing more slowly, shows what you should see after every
+> command, and assumes no programming experience at all. Come back here once it works.
+
 - [Before you start](#before-you-start)
 - [Install](#install)
 - [Preview anything for free](#preview-anything-for-free)
