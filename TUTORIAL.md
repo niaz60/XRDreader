@@ -222,15 +222,23 @@ explorer C:\my_xrd_work
 ```
 
 Inside `xrdreader_output` there is a folder named with today's date and time. Open it, and you
-will find three folders:
+will find three folders and one file:
 
-| Folder | What is in it |
+| | What is in it |
 |---|---|
+| `report.html` | **start here** — the whole run on one page |
 | `documents` | the scientific paper it downloaded, as a PDF |
 | `results` | everything it extracted |
 | `logs` | a record of what it did, useful if something looked wrong |
 
-Open `results`. The file you want is the one ending in:
+**Double-click `report.html`.** It opens in your browser and shows you what XRDreader did: whether
+it kept the paper and why, the figures it found inside it, the data it pulled out of each one, and
+every question it asked itself along the way. Nothing to install, and it works without internet.
+
+> Leave `report.html` where it is. It shows the pictures stored next to it, so moving the file on
+> its own leaves it with empty boxes where the figures should be.
+
+If you would rather read the raw data, open `results`. The file you want is the one ending in:
 
 ```
 __phase3_validated_FINAL.json

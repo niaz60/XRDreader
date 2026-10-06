@@ -92,8 +92,13 @@ timestamped folder, so runs never overwrite each other ::
             documents/   the PDFs it downloaded
             results/     extracted JSON and cropped figures
             logs/        the run log
+            report.html  what the run did, as one page
 
 The file ending ``__phase3_validated_FINAL.json`` holds the validated result for each paper.
+
+Open ``report.html`` in a browser to see what happened: which papers were kept or rejected and
+why, the figures it found, the metadata it extracted, and every tool call its agents made. It
+needs no server and no network.
 
 Add ``--dry-run`` to any command to print the configuration it resolved and exit, without
 downloading anything or calling a model. Launch the web interface with ``diffai-xrdreader --ui``.

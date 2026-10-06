@@ -79,6 +79,7 @@ xrdreader_output/2026-08-07_143022/
     documents/   downloaded PDFs
     results/     JSON output, figure crops
     logs/        run log
+    report.html  what the run did, as one page
 ```
 
 The file ending `__phase3_validated_FINAL.json` holds the final extracted data. Use `-o NAME`
