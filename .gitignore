@@ -25,6 +25,7 @@ ENV/
 downloaded_PDFs/
 outputs/
 *.log
+report.html
 
 # OS / editor cruft
 .DS_Store
