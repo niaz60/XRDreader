@@ -28,7 +28,7 @@ it from source as shown below.
 What it does
 ------------
 
-Given keywords such as ``Cu OR Copper``, XRDreader runs four steps and leaves a validated JSON
+Given keywords such as ``Cu OR Copper`` and ``XRD``, XRDreader runs four steps and leaves a validated JSON
 record for every paper it keeps:
 
 **Step 0 — download and screening** (``download``, ``step0``)
