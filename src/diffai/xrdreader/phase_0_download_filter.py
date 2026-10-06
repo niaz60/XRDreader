@@ -22,14 +22,14 @@ from typing import Any, Dict, List, Optional
 import fitz
 from openai import OpenAI
 
-from diffai.eraf4xrd.config import (
+from diffai.xrdreader.config import (
     ENABLE_AGENTIC_PHASE0,
     MODEL,
     PDF_DIR,
     PHASE0_KEEP_DIR,
     PHASE0_REJECT_DIR,
 )
-from diffai.eraf4xrd.utils import humanize_llm_error, log, make_safe_stem
+from diffai.xrdreader.utils import humanize_llm_error, log, make_safe_stem
 
 
 # ======================================================================================
@@ -471,7 +471,7 @@ def run_phase0_agent(client: Any, pdf_path: Path) -> Dict:
         }
 
     try:
-        from diffai.eraf4xrd.tool_calling import ToolCaller
+        from diffai.xrdreader.tool_calling import ToolCaller
 
         caller = ToolCaller(
             provider,
@@ -498,7 +498,7 @@ def run_phase0_agent(client: Any, pdf_path: Path) -> Dict:
             elapsed = time.time() - _t0
 
             # Log usage
-            from diffai.eraf4xrd.usage_tracker import get_tracker
+            from diffai.xrdreader.usage_tracker import get_tracker
 
             usage = caller.get_last_call_usage()
             get_tracker().log_call(
@@ -652,7 +652,7 @@ def run_phase0_agent(client: Any, pdf_path: Path) -> Dict:
         result = {**final, "agent_trace": trace, "steps_used": steps_used}
 
         # Confidence calibration log
-        from diffai.eraf4xrd.utils import log_confidence
+        from diffai.xrdreader.utils import log_confidence
 
         log_confidence(
             phase="phase0",
@@ -724,7 +724,7 @@ def screen_pdf_single_shot(pdf_path: Path) -> Dict:
         f"TABLE OF CONTENTS:\n{toc}"
     )
 
-    from diffai.eraf4xrd.tool_calling import ToolCaller
+    from diffai.xrdreader.tool_calling import ToolCaller
 
     caller = ToolCaller(provider, model, max_retries=PHASE0_MAX_API_RETRIES)
     caller.add_user_message(PHASE0_SINGLE_SHOT_PROMPT + "\n\n" + evidence_text)
@@ -734,7 +734,7 @@ def screen_pdf_single_shot(pdf_path: Path) -> Dict:
         tool_calls, text_response = caller.call([])
         elapsed = time.time() - _t0
 
-        from diffai.eraf4xrd.usage_tracker import get_tracker
+        from diffai.xrdreader.usage_tracker import get_tracker
 
         usage = caller.get_usage()
         get_tracker().log_call(
@@ -765,7 +765,7 @@ def screen_pdf_single_shot(pdf_path: Path) -> Dict:
             ],
             "steps_used": 1,
         }
-        from diffai.eraf4xrd.utils import log_confidence
+        from diffai.xrdreader.utils import log_confidence
 
         log_confidence(
             phase="phase0",

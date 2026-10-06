@@ -1,6 +1,6 @@
 BSD 3-Clause License
 
-Copyright (c) 2026, diffai.eraf4xrd contributors.
+Copyright (c) 2026, diffai.xrdreader contributors.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

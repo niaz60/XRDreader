@@ -1,4 +1,4 @@
-"""Command-line entry point for ERAF4XRD (`diffai-eraf4xrd`).
+"""Command-line entry point for XRDreader (`diffai-xrdreader`).
 
 Parses CLI flags, translates them into the RUN_* / USE_* env-var switches that
 config.py reads, then imports and runs the pipeline. Flags must be applied
@@ -41,10 +41,10 @@ SOURCE_ENVS = {
 
 
 def _build_parser():
-    """Build the argparse parser for the diffai-eraf4xrd CLI."""
+    """Build the argparse parser for the diffai-xrdreader CLI."""
     ap = argparse.ArgumentParser(
-        prog="diffai-eraf4xrd",
-        description="Run the ERAF4XRD framework from the command line. With no flags it "
+        prog="diffai-xrdreader",
+        description="Run the XRDreader framework from the command line. With no flags it "
         "uses the switches from config.py / the environment (default: download + Step 0 "
         "only). ANY config setting can be overridden with --set NAME=VALUE.",
     )
@@ -134,7 +134,7 @@ def _build_parser():
         "--output-dir",
         metavar="DIR",
         help="Write all outputs under DIR (documents/, results/, logs/). "
-        "Default: a timestamped folder ./eraf4xrd_output/<date>_<time>/.",
+        "Default: a timestamped folder ./xrdreader_output/<date>_<time>/.",
     )
     ap.add_argument(
         "--dry-run",
@@ -188,7 +188,7 @@ def _apply_cli_flags(argv=None):
 
     # ---- output dir: single root for all outputs (default = timestamped) ----
     if args.output_dir is not None:
-        os.environ["ERAF4XRD_OUTPUT_DIR"] = args.output_dir
+        os.environ["XRDREADER_OUTPUT_DIR"] = args.output_dir
 
     # ---- download & search ----
     if args.downloads is not None:
@@ -235,7 +235,7 @@ def _print_dry_run():
     """
     import os
 
-    from diffai.eraf4xrd import config as c
+    from diffai.xrdreader import config as c
 
     steps = [
         ("Download", c.RUN_DOWNLOAD),
@@ -292,9 +292,9 @@ def run():
     # config.py reads every setting from the environment at import time.
     from pathlib import Path
 
-    from diffai.eraf4xrd.config import OUTPUT_TXT_DIR
-    from diffai.eraf4xrd.pipeline import pipeline
-    from diffai.eraf4xrd.utils import ensure_dir, log, set_log_file
+    from diffai.xrdreader.config import OUTPUT_TXT_DIR
+    from diffai.xrdreader.pipeline import pipeline
+    from diffai.xrdreader.utils import ensure_dir, log, set_log_file
 
     ensure_dir(OUTPUT_TXT_DIR)
     log_path = (
@@ -330,10 +330,10 @@ def launch_ui():
     import subprocess
     import sys
 
-    spec = importlib.util.find_spec("diffai.eraf4xrd.webapp")
+    spec = importlib.util.find_spec("diffai.xrdreader.webapp")
     if spec is None or not spec.origin:
         raise SystemExit(
-            "Could not locate the web interface (diffai.eraf4xrd.webapp). "
+            "Could not locate the web interface (diffai.xrdreader.webapp). "
             "Try reinstalling the package."
         )
 
@@ -345,7 +345,7 @@ def launch_ui():
             "pip install streamlit"
         )
 
-    print(f"Starting the ERAF4XRD web interface from {os.getcwd()}")
+    print(f"Starting the XRDreader web interface from {os.getcwd()}")
     print("Press Ctrl+C in this terminal to stop it.")
     try:
         return subprocess.call(
@@ -357,7 +357,7 @@ def launch_ui():
 
 
 def main():
-    """Console entry point (diffai-eraf4xrd): parse flags, then run."""
+    """Console entry point (diffai-xrdreader): parse flags, then run."""
     args = _apply_cli_flags()
     if args.ui:
         raise SystemExit(launch_ui())

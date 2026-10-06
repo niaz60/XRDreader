@@ -8,7 +8,7 @@ jobs:
   tests-on-pr:
     uses: scikit-package/release-scripts/.github/workflows/_tests-on-pr.yml@v0
     with:
-      project: diffai.eraf4xrd
+      project: diffai.xrdreader
       c_extension: false
       headless: true
     secrets:

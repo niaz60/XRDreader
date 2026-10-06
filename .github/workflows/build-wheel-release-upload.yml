@@ -26,7 +26,7 @@ jobs:
   build-release:
     uses: scikit-package/release-scripts/.github/workflows/_build-wheel-release-upload.yml@v0
     with:
-      project: diffai.eraf4xrd
+      project: diffai.xrdreader
       c_extension: false
       maintainer_github_username: sbillinge
     secrets:
@@ -47,7 +47,7 @@ jobs:
   # build-release-no-pypi:
   #   uses: scikit-package/release-scripts/.github/workflows/_build-release-github-no-pypi.yml@v0
   #   with:
-  #     project: diffai.eraf4xrd
+  #     project: diffai.xrdreader
   #     c_extension: false
   #     maintainer_github_username: sbillinge
   #   secrets:
@@ -70,7 +70,7 @@ jobs:
   # build-release-private:
   #   uses: scikit-package/release-scripts/.github/workflows/_build-release-github-private-pure.yml@v0
   #   with:
-  #     project: diffai.eraf4xrd
+  #     project: diffai.xrdreader
   #     maintainer_github_username: sbillinge
   #   secrets:
   #     PAT_TOKEN: ${{ secrets.PAT_TOKEN }}

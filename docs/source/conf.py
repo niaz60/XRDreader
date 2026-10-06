@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# diffai.eraf4xrd documentation build configuration file, created by  # noqa: E501
+# diffai.xrdreader documentation build configuration file, created by  # noqa: E501
 # sphinx-quickstart on Thu Jan 30 15:49:41 2014.
 #
 # This file is execfile()d with the current directory set to its
@@ -20,7 +20,7 @@ from pathlib import Path
 
 # Attempt to import the version dynamically from GitHub tag.
 try:
-    fullversion = version("diffai.eraf4xrd")
+    fullversion = version("diffai.xrdreader")
 except Exception:
     fullversion = "No version found. The correct version will appear in the released version."  # noqa: E501
 
@@ -32,7 +32,7 @@ sys.path.insert(0, str(Path("../..").resolve()))
 sys.path.insert(0, str(Path("../../src").resolve()))
 
 # abbreviations
-ab_authors = "Afnan Mostafa and contributors to the diffai.eraf4xrd project"
+ab_authors = "Afnan Mostafa and contributors to the diffai.xrdreader project"
 
 # -- General configuration ------------------------------------------------
 
@@ -68,8 +68,8 @@ source_suffix = [".rst", ".md"]
 master_doc = "index"
 
 # General information about the project.
-project = "diffai.eraf4xrd"
-copyright = "%Y, diffai.eraf4xrd contributors"
+project = "diffai.xrdreader"
+copyright = "%Y, diffai.xrdreader contributors"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -122,7 +122,7 @@ exclude_patterns = ["build"]
 pygments_style = "sphinx"
 
 # A list of ignored prefixes for module index sorting.
-modindex_common_prefix = ["diffai.eraf4xrd"]
+modindex_common_prefix = ["diffai.xrdreader"]
 
 # Display all warnings for missing links.
 nitpicky = True
@@ -137,7 +137,7 @@ html_theme = "sphinx_rtd_theme"
 html_context = {
     "display_github": True,
     "github_user": "diffractionai",
-    "github_repo": "diffai.eraf4xrd",
+    "github_repo": "diffai.xrdreader",
     "github_version": "main",
     "conf_py_path": "/docs/source/",
 }
@@ -221,7 +221,7 @@ html_theme_options = {
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-basename = "diffai.eraf4xrd".replace(" ", "").replace(".", "")
+basename = "diffai.xrdreader".replace(" ", "").replace(".", "")
 htmlhelp_basename = basename + "doc"
 
 
@@ -242,8 +242,8 @@ latex_elements = {
 latex_documents = [
     (
         "index",
-        "diffai.eraf4xrd.tex",
-        "diffai.eraf4xrd Documentation",
+        "diffai.xrdreader.tex",
+        "diffai.xrdreader Documentation",
         ab_authors,
         "manual",
     ),
@@ -277,8 +277,8 @@ latex_documents = [
 man_pages = [
     (
         "index",
-        "diffai.eraf4xrd",
-        "diffai.eraf4xrd Documentation",
+        "diffai.xrdreader",
+        "diffai.xrdreader Documentation",
         ab_authors,
         1,
     )
@@ -296,10 +296,10 @@ man_pages = [
 texinfo_documents = [
     (
         "index",
-        "diffai.eraf4xrd",
-        "diffai.eraf4xrd Documentation",
+        "diffai.xrdreader",
+        "diffai.xrdreader Documentation",
         ab_authors,
-        "diffai.eraf4xrd",
+        "diffai.xrdreader",
         "One line description of project.",
         "Miscellaneous",
     ),

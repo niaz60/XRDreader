@@ -22,7 +22,7 @@ import springernature_api_client.openaccess as openaccess
 from bs4 import BeautifulSoup
 from springernature_api_client.utils import results_to_dataframe
 
-from diffai.eraf4xrd.config import (
+from diffai.xrdreader.config import (
     ANY_JOURNAL,
     BATCH,
     ELEMENTS,
@@ -34,7 +34,7 @@ from diffai.eraf4xrd.config import (
     TARGET_DOWNLOADS,
     TECHNIQUE,
 )
-from diffai.eraf4xrd.utils import (
+from diffai.xrdreader.utils import (
     ensure_dir,
     get_source_subdir,
     log,
@@ -129,7 +129,7 @@ def find_pdf_link(url: str) -> str | None:
 
 
 # makes requests look like they come from a browser-like client
-HEADERS = {"User-Agent": "Mozilla/5.0 (ERAF4XRD; Springer OA Downloader)"}
+HEADERS = {"User-Agent": "Mozilla/5.0 (XRDreader; Springer OA Downloader)"}
 
 
 # silent Springer API search

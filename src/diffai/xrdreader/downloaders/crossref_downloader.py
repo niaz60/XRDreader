@@ -14,7 +14,7 @@ import time
 
 import requests
 
-from diffai.eraf4xrd.config import (
+from diffai.xrdreader.config import (
     ELEMENTS,
     OUTPUT_PDF_DIR,
     REQUIRE_CC_LICENSE,
@@ -23,7 +23,7 @@ from diffai.eraf4xrd.config import (
     TECHNIQUE,
     UNPAYWALL_EMAIL,
 )
-from diffai.eraf4xrd.utils import (
+from diffai.xrdreader.utils import (
     ensure_dir,
     get_source_subdir,
     log,
@@ -82,7 +82,7 @@ def download_crossref_oa_pdfs():
 
         downloaded = 0
         headers = {
-            "User-Agent": "Mozilla/5.0 (ERAF4XRD; OA PDF Downloader)"  # pretends to be a browser-like request to reduce blocking by publishers.
+            "User-Agent": "Mozilla/5.0 (XRDreader; OA PDF Downloader)"  # pretends to be a browser-like request to reduce blocking by publishers.
         }
 
         # loop over DOIs (one DOI at a time)

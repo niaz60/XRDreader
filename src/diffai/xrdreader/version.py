@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 ##############################################################################
 #
-# (c) 2026 diffai.eraf4xrd contributors.
+# (c) 2026 diffai.xrdreader contributors.
 # All rights reserved.
 #
-# File coded by: Afnan Mostafa and contributors to the diffai.eraf4xrd project.
+# File coded by: Afnan Mostafa and contributors to the diffai.xrdreader project.
 #
 # See GitHub contributions for a more detailed list of contributors.
 # https://github.com/diffractionai/diffai.xrdreader/graphs/contributors  # noqa: E501
@@ -21,6 +21,6 @@
 from importlib.metadata import PackageNotFoundError, version
 
 try:
-    __version__ = version("diffai.eraf4xrd")
+    __version__ = version("diffai.xrdreader")
 except PackageNotFoundError:
     __version__ = "unknown"

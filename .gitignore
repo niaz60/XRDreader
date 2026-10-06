@@ -19,8 +19,9 @@ ENV/
 .env.*
 .streamlit/secrets.toml
 
-# ERAF4XRD generated data / outputs (regenerable — not code)
-eraf4xrd_output/
+# XRDreader generated data / outputs (regenerable — not code)
+# wildcard so run folders from earlier names (eraf4xrd_output/) stay ignored too
+*_output/
 downloaded_PDFs/
 outputs/
 *.log

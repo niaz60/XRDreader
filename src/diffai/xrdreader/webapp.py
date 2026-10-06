@@ -1,4 +1,4 @@
-"""Streamlit web UI for ERAF4XRD (the DiffAI app).
+"""Streamlit web UI for XRDreader (the DiffAI app).
 
 Wraps the pipeline in a browser front-end: upload/select PDFs, configure
 and launch a run, watch phase progress, browse and edit the extracted
@@ -23,7 +23,7 @@ from typing import Dict
 import cv2
 import streamlit as st
 
-from diffai.eraf4xrd.utils import make_safe_stem
+from diffai.xrdreader.utils import make_safe_stem
 
 # set_page_config() must be the FIRST Streamlit command executed in the script.
 st.set_page_config(page_title="DiffAI", layout="wide")
@@ -1002,13 +1002,13 @@ BASE_DIR = Path(__file__).resolve().parent
 
 
 def runs_root() -> Path:
-    """The folder holding every timestamped run (``<workdir>/eraf4xrd_output``).
+    """The folder holding every timestamped run (``<workdir>/xrdreader_output``).
 
     Taken from config so the UI and the pipeline can never disagree.
     ``config.OUTPUT_ROOT`` carries a fresh timestamp per process, so only its
     parent is stable -- that parent is what collects the runs.
     """
-    from diffai.eraf4xrd import config as _cfg
+    from diffai.xrdreader import config as _cfg
 
     return Path(_cfg.OUTPUT_ROOT).parent
 
@@ -2911,9 +2911,9 @@ def run_pipeline(env_overrides: dict):
     env["PYTHONIOENCODING"] = "utf-8"
     env["PYTHONUTF8"] = "1"
 
-    cmd = [sys.executable, "-m", "diffai.eraf4xrd.app"]
+    cmd = [sys.executable, "-m", "diffai.xrdreader.app"]
     # Run from the launch dir, NOT the installed package dir -- otherwise
-    # outputs land under src/diffai/eraf4xrd/ (deep path + pollutes install).
+    # outputs land under src/diffai/xrdreader/ (deep path + pollutes install).
     process = subprocess.Popen(
         cmd,
         cwd=os.getcwd(),
@@ -3069,9 +3069,9 @@ if "current_page" not in st.session_state:
     st.session_state.current_page = "home"
 
 
-def go_to_eraf4xrd():
-    """Switch the UI to the ERAF4XRD page."""
-    st.session_state.current_page = "eraf4xrd"
+def go_to_xrdreader():
+    """Switch the UI to the XRDreader page."""
+    st.session_state.current_page = "xrdreader"
 
 
 def go_home():
@@ -3211,9 +3211,9 @@ if st.session_state.current_page == "home":
             AI-powered tools for scientific diffraction data extraction, analysis, and validation.
         </p>
         <div class="diffai-grid">
-            <div class="tool-card active" id="eraf4xrd-card" onclick="this.classList.toggle('selected'); document.getElementById('xrd-open-hint').style.display = this.classList.contains('selected') ? 'block' : 'none';">
+            <div class="tool-card active" id="xrdreader-card" onclick="this.classList.toggle('selected'); document.getElementById('xrd-open-hint').style.display = this.classList.contains('selected') ? 'block' : 'none';">
                 <div class="tool-icon">&#x1F4CA;</div>
-                <div class="tool-name">ERAF4XRD</div>
+                <div class="tool-name">XRDreader</div>
                 <div class="tool-desc">
                     Extract XRD data from scientific papers. Downloads PDFs, screens for XRD content,
                     detects figures, extracts metadata, and digitizes diffraction curves.
@@ -3231,7 +3231,7 @@ if st.session_state.current_page == "home":
         </div>
         <div id="xrd-open-hint" style="display:none; margin-top:1.5rem; text-align:center; animation: fadeIn 0.3s ease;">
             <p style="color:#4338ca; font-weight:600; font-size:0.95rem; margin-bottom:0.5rem;">
-                &#x2193; Click the button below to open ERAF4XRD &#x2193;
+                &#x2193; Click the button below to open XRDreader &#x2193;
             </p>
         </div>
         <div class="diffai-footer">
@@ -3246,15 +3246,15 @@ if st.session_state.current_page == "home":
     )
 
     st.button(
-        "Open ERAF4XRD",
-        on_click=go_to_eraf4xrd,
+        "Open XRDreader",
+        on_click=go_to_xrdreader,
         type="primary",
         use_container_width=False,
     )
     st.stop()
 
 # =========================================================================
-# ERAF4XRD PAGE (everything below is the existing ERAF4XRD UI)
+# XRDreader PAGE (everything below is the existing XRDreader UI)
 # =========================================================================
 
 init_state()
@@ -3263,7 +3263,7 @@ st.markdown(
     """
 <div class="hero-shell">
     <div class="hero-kicker">X-ray diffraction data, simplified</div>
-    <div class="hero-title">ERAF4XRD</div>
+    <div class="hero-title">XRDreader</div>
     <div class="hero-subtitle">
         <span class="hero-highlight">From scientific papers to structured data</span><br>
         Extract, organize, and analyze XRD data.
@@ -3681,7 +3681,7 @@ with tab_run:
     is_running_now = st.session_state.get("is_running", False)
 
     run_clicked = st.button(
-        "▶  Run ERAF4XRD",
+        "▶  Run XRDreader",
         type="primary",
         disabled=is_running_now,
         use_container_width=True,
@@ -4297,7 +4297,7 @@ with tab_results:
                 # Discover XRD figures from Step I output.
                 # The digitizer module is optional in this build; degrade gracefully if absent.
                 try:
-                    from diffai.eraf4xrd.digitizer import (
+                    from diffai.xrdreader.digitizer import (
                         build_digitized_output,
                         digitize_figure,
                         discover_xrd_figures,
@@ -5310,7 +5310,7 @@ with tab_results:
             st.download_button(
                 f"📥 Download ZIP ({file_count} files)",
                 data=zip_buffer.getvalue(),
-                file_name="eraf4xrd_results.zip",
+                file_name="xrdreader_results.zip",
                 mime="application/zip",
                 key="dl_all_zip",
             )

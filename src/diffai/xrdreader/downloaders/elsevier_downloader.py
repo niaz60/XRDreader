@@ -12,7 +12,7 @@ import time
 
 import requests
 
-from diffai.eraf4xrd.config import (
+from diffai.xrdreader.config import (
     ELEMENTS,
     ELSEVIER_API_KEY,
     OUTPUT_PDF_DIR,
@@ -21,7 +21,7 @@ from diffai.eraf4xrd.config import (
     TARGET_DOWNLOADS,
     TECHNIQUE,
 )
-from diffai.eraf4xrd.utils import (
+from diffai.xrdreader.utils import (
     ensure_dir,
     get_source_subdir,
     log,

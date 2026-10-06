@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 ##############################################################################
 #
-# (c) 2026 diffai.eraf4xrd contributors.
+# (c) 2026 diffai.xrdreader contributors.
 # All rights reserved.
 #
 # File coded by: Billinge Group members and community contributors.

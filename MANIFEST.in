@@ -7,10 +7,10 @@ include AUTHORS.rst LICENSE*.rst README.rst
 # Never package runtime output or downloaded data. `graft src` pulls from the
 # filesystem (not git), so .gitignore does NOT protect the sdist -- these prune
 # rules do. Keeps copyrighted PDFs and local-path logs out of any build.
-prune src/diffai/eraf4xrd/eraf4xrd_output
-prune src/diffai/eraf4xrd/downloaded_PDFs
-prune src/diffai/eraf4xrd/outputs
-prune src/diffai/eraf4xrd/logs
+prune src/diffai/xrdreader/xrdreader_output
+prune src/diffai/xrdreader/downloaded_PDFs
+prune src/diffai/xrdreader/outputs
+prune src/diffai/xrdreader/logs
 global-exclude *.log
 
 # Exclude all bytecode files and __pycache__ directories

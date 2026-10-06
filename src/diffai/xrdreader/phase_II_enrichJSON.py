@@ -29,7 +29,7 @@ import fitz  # PyMuPDF (used ONLY for robust caption/window text)
 import pdfplumber
 
 # ===================== EDIT HERE =====================
-from diffai.eraf4xrd.config import (
+from diffai.xrdreader.config import (
     CAPTION_BLOCK_GAP_PX,
     CAPTION_FOOTER_Y_FRAC,
     CAPTION_MAX_CHARS,
@@ -51,7 +51,7 @@ from diffai.eraf4xrd.config import (
     USE_LLM_VERIFY_FIGS,
     USE_LLM_VERIFY_GLOBAL,
 )
-from diffai.eraf4xrd.utils import make_safe_stem
+from diffai.xrdreader.utils import make_safe_stem
 
 # =================== /EDIT HERE ======================
 
@@ -1132,7 +1132,7 @@ def call_text_llm(prompt_a: str, prompt_b: str) -> str:
             ],
             temperature=0.0,
         )
-        from diffai.eraf4xrd.usage_tracker import get_tracker
+        from diffai.xrdreader.usage_tracker import get_tracker
 
         get_tracker().log_call(
             phase="phase2",
@@ -1190,7 +1190,7 @@ def call_text_llm(prompt_a: str, prompt_b: str) -> str:
         }
         _t0 = time.time()
         obj = _http_post_json(url, payload, headers={})
-        from diffai.eraf4xrd.usage_tracker import log_http_call
+        from diffai.xrdreader.usage_tracker import log_http_call
 
         log_http_call(
             "phase2",
@@ -1238,7 +1238,7 @@ def call_text_llm(prompt_a: str, prompt_b: str) -> str:
                 "anthropic-version": "2023-06-01",
             },
         )
-        from diffai.eraf4xrd.usage_tracker import log_http_call
+        from diffai.xrdreader.usage_tracker import log_http_call
 
         log_http_call(
             "phase2",
@@ -1276,7 +1276,7 @@ def call_text_llm(prompt_a: str, prompt_b: str) -> str:
             ],
             temperature=0.0,
         )
-        from diffai.eraf4xrd.usage_tracker import get_tracker
+        from diffai.xrdreader.usage_tracker import get_tracker
 
         _tracker = get_tracker()
         usage = getattr(resp, "usage", None)
@@ -1960,7 +1960,7 @@ def run_phase2_verify_agent(
     provider = PHASE2_PROVIDER
     model = PHASE2_MODEL
 
-    from diffai.eraf4xrd.tool_calling import ToolCaller
+    from diffai.xrdreader.tool_calling import ToolCaller
 
     toolbox = Phase2AgentToolbox(doc, pages_text, pdf_path=pdf_path)
 
@@ -1989,7 +1989,7 @@ def run_phase2_verify_agent(
             tool_calls, _ = caller.call(PHASE2_AGENT_TOOLS)
             elapsed = time.time() - _t0
 
-            from diffai.eraf4xrd.usage_tracker import get_tracker
+            from diffai.xrdreader.usage_tracker import get_tracker
 
             usage = caller.get_last_call_usage()
             get_tracker().log_call(
@@ -2078,7 +2078,7 @@ def enrich_one_phase1_json(phase1_json_path: Path):
     pdf_path = resolve_pdf_path(phase1["pdf"], phase1_json_path)
     phase1["pdf_resolved"] = str(pdf_path)
 
-    from diffai.eraf4xrd.usage_tracker import set_current_pdf
+    from diffai.xrdreader.usage_tracker import set_current_pdf
 
     set_current_pdf(pdf_path.name)
 
@@ -2307,7 +2307,7 @@ def main():
             print(f"[FAIL] {p1.name}: {repr(e)}")
             traceback.print_exc()
 
-    from diffai.eraf4xrd.usage_tracker import set_current_pdf as _clear_pdf
+    from diffai.xrdreader.usage_tracker import set_current_pdf as _clear_pdf
 
     _clear_pdf()
 

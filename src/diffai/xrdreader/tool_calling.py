@@ -5,7 +5,7 @@ Abstracts the provider-specific tool-calling API formats so every phase
 can run the same agent loop regardless of provider (GPT, Grok, Gemini, Claude).
 
 Usage:
-    from diffai.eraf4xrd.tool_calling import ToolCaller
+    from diffai.xrdreader.tool_calling import ToolCaller
 
     caller = ToolCaller(provider, model)
     caller.set_system(system_prompt)

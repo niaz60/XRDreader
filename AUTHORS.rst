@@ -1,7 +1,7 @@
 Authors
 =======
 
-Afnan Mostafa and contributors to the diffai.eraf4xrd project
+Afnan Mostafa and contributors to the diffai.xrdreader project
 
 Contributors
 ------------

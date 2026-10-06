@@ -1,8 +1,8 @@
-# ERAF4XRD tutorial — your first run
+# XRDreader tutorial — your first run
 
 This gets you from a brand-new computer to real results. No programming knowledge needed.
 
-**You will:** install two free programs, install ERAF4XRD, and run it on a real scientific
+**You will:** install two free programs, install XRDreader, and run it on a real scientific
 paper. It will find the X-ray diffraction figures in that paper and pull out the data.
 
 **You need:** a Windows computer, and an OpenAI account (your first run costs about 30 cents).
@@ -74,7 +74,7 @@ then close the window and open a new Anaconda Powershell Prompt.
 
 ---
 
-## Part 3 — Install ERAF4XRD
+## Part 3 — Install XRDreader
 
 Also only once. Six commands, one at a time.
 
@@ -84,26 +84,26 @@ Also only once. Six commands, one at a time.
 cd C:\
 ```
 
-**3b.** Download ERAF4XRD.
+**3b.** Download XRDreader.
 
 ```
-git clone https://github.com/niaz60/ERAF4XRD.git
+git clone https://github.com/niaz60/XRDreader.git
 ```
 
-You should see `Cloning into 'ERAF4XRD'...` and then a few lines about receiving
+You should see `Cloning into 'XRDreader'...` and then a few lines about receiving
 objects. It takes under a minute.
 
 **3c.** Go into the folder that just appeared.
 
 ```
-cd C:\ERAF4XRD
+cd C:\XRDreader
 ```
 
-**3d.** Make a private space for ERAF4XRD to live in, so it cannot disturb anything else on
+**3d.** Make a private space for XRDreader to live in, so it cannot disturb anything else on
 your computer.
 
 ```
-conda create -n eraf4xrd python=3.13 -y
+conda create -n xrdreader python=3.13 -y
 ```
 
 Lots of text scrolls past. It ends with the word `done`. This takes a minute or two.
@@ -111,13 +111,13 @@ Lots of text scrolls past. It ends with the word `done`. This takes a minute or 
 **3e.** Switch into that space.
 
 ```
-conda activate eraf4xrd
+conda activate xrdreader
 ```
 
-Look at the start of your prompt. It changed from `(base)` to **`(eraf4xrd)`**. That is how you
+Look at the start of your prompt. It changed from `(base)` to **`(xrdreader)`**. That is how you
 know it worked.
 
-**3f.** Install ERAF4XRD itself.
+**3f.** Install XRDreader itself.
 
 ```
 pip install .
@@ -127,28 +127,28 @@ A great deal of text scrolls past for a few minutes. You are looking for a line 
 that says:
 
 ```
-Successfully installed ... diffai.eraf4xrd-0.0.1 ...
+Successfully installed ... diffai.xrdreader-0.0.1 ...
 ```
 
 > You will probably also see a red block saying `ERROR: pip's dependency resolver...` and
 > something about `ipykernel` and `tornado`. **Ignore it.** It is complaining about an
-> unrelated program, not about ERAF4XRD. As long as you see `Successfully installed`, you are
+> unrelated program, not about XRDreader. As long as you see `Successfully installed`, you are
 > fine.
 
 **3g.** Check it worked.
 
 ```
-diffai-eraf4xrd --help
+diffai-xrdreader --help
 ```
 
-You should see a list of options starting with `usage: diffai-eraf4xrd`. If you do, ERAF4XRD is
+You should see a list of options starting with `usage: diffai-xrdreader`. If you do, XRDreader is
 installed.
 
 ---
 
 ## Part 4 — Get your AI key
 
-ERAF4XRD uses an AI model to read the papers, so it needs your own key. Once only.
+XRDreader uses an AI model to read the papers, so it needs your own key. Once only.
 
 1. Go to <https://platform.openai.com/api-keys> and sign in (or create an account).
 2. You will need to add a payment method and put a few dollars of credit on the account.
@@ -174,7 +174,7 @@ mkdir C:\my_xrd_work
 cd C:\my_xrd_work
 ```
 
-**5b.** Give ERAF4XRD your key. Replace `sk-paste-your-key-here` with the key you copied,
+**5b.** Give XRDreader your key. Replace `sk-paste-your-key-here` with the key you copied,
 keeping the quotes.
 
 ```
@@ -186,7 +186,7 @@ Nothing appears to happen. That is correct.
 **5c.** Run it.
 
 ```
-diffai-eraf4xrd --full-run --sources arxiv -n 1
+diffai-xrdreader --full-run --sources arxiv -n 1
 ```
 
 Now it works for about two to three minutes. You will see lines scroll past like:
@@ -204,7 +204,7 @@ At the end you get a table of what it cost, and the last line says:
 Pipeline completed.
 ```
 
-**That is it. You have run ERAF4XRD.**
+**That is it. You have run XRDreader.**
 
 ---
 
@@ -216,7 +216,7 @@ Open your results folder in Windows:
 explorer C:\my_xrd_work
 ```
 
-Inside `eraf4xrd_output` there is a folder named with today's date and time. Open it, and you
+Inside `xrdreader_output` there is a folder named with today's date and time. Open it, and you
 will find three folders:
 
 | Folder | What is in it |
@@ -231,7 +231,7 @@ Open `results`. The file you want is the one ending in:
 __phase3_validated_FINAL.json
 ```
 
-That is your answer — the XRD data ERAF4XRD found in the paper, after it checked its own work.
+That is your answer — the XRD data XRDreader found in the paper, after it checked its own work.
 You can open it in Notepad, or in your browser, or in Excel.
 
 You will also see `.png` image files in the folders ending `_xrd` — those are the actual
@@ -245,7 +245,7 @@ You never repeat Parts 1, 3 or 4. But two things are forgotten when you close th
 each time you start a new Anaconda Powershell Prompt, run these two first:
 
 ```
-conda activate eraf4xrd
+conda activate xrdreader
 ```
 
 ```
@@ -259,7 +259,7 @@ cd C:\my_xrd_work
 ```
 
 ```
-diffai-eraf4xrd --full-run --sources arxiv -n 1
+diffai-xrdreader --full-run --sources arxiv -n 1
 ```
 
 ---
@@ -269,13 +269,13 @@ diffai-eraf4xrd --full-run --sources arxiv -n 1
 The run above looked for papers about copper. To look for something else, add `--elements`:
 
 ```
-diffai-eraf4xrd --full-run --sources arxiv -n 1 --elements "Mo OR Molybdenum"
+diffai-xrdreader --full-run --sources arxiv -n 1 --elements "Mo OR Molybdenum"
 ```
 
 To get more papers, change the number after `-n`:
 
 ```
-diffai-eraf4xrd --full-run --sources arxiv -n 5
+diffai-xrdreader --full-run --sources arxiv -n 5
 ```
 
 Each paper costs roughly 30 cents, so `-n 5` costs around $1.50.
@@ -283,7 +283,7 @@ Each paper costs roughly 30 cents, so `-n 5` costs around $1.50.
 To see what a command would do **without spending anything**, add `--dry-run` to the end:
 
 ```
-diffai-eraf4xrd --full-run --sources arxiv -n 5 --dry-run
+diffai-xrdreader --full-run --sources arxiv -n 5 --dry-run
 ```
 
 ---
@@ -294,11 +294,11 @@ diffai-eraf4xrd --full-run --sources arxiv -n 5 --dry-run
 |---|---|
 | `conda is not recognized` | You are in the wrong window. Close it and open **Anaconda Powershell Prompt** (Part 2) |
 | `git is not recognized` | Git did not install. Redo Part 1b, then open a new window |
-| `ModuleNotFoundError: No module named 'diffai.eraf4xrd'` | You forgot `conda activate eraf4xrd`. Run it and try again |
+| `ModuleNotFoundError: No module named 'diffai.xrdreader'` | You forgot `conda activate xrdreader`. Run it and try again |
 | `Missing API key(s) for the steps this run would execute` | You forgot step 5b, or you opened a new window since. Redo 5b |
 | A red `ERROR` about `ipykernel` / `tornado` during Part 3f | Ignore it. Check for `Successfully installed` just below |
 | `You exceeded your current quota` | Your OpenAI account is out of credit. Add some at platform.openai.com |
-| Your prompt says `(base)` not `(eraf4xrd)` | Run `conda activate eraf4xrd` |
+| Your prompt says `(base)` not `(xrdreader)` | Run `conda activate xrdreader` |
 
 ---
 

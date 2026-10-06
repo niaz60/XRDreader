@@ -1,4 +1,4 @@
-"""Central configuration for ERAF4XRD.
+"""Central configuration for XRDreader.
 
 Every setting is read from an environment variable (with a sensible default)
 at import time, so CLI flags / env vars must be set BEFORE this module is
@@ -92,18 +92,18 @@ BASE_DIR = (
     Path(__file__).resolve().parent
 )  # installed package dir (bundled data)
 # Writable outputs default to the user's working directory, NOT the installed
-# package location. Override the base with ERAF4XRD_WORKDIR.
-WORK_DIR = Path(os.environ.get("ERAF4XRD_WORKDIR", ".")).resolve()
+# package location. Override the base with XRDREADER_WORKDIR.
+WORK_DIR = Path(os.environ.get("XRDREADER_WORKDIR", ".")).resolve()
 # Single output root. Default = a timestamped folder so each run is self-contained
-# and never clobbers a previous one; override with --output-dir / ERAF4XRD_OUTPUT_DIR.
+# and never clobbers a previous one; override with --output-dir / XRDREADER_OUTPUT_DIR.
 from datetime import datetime as _dt  # noqa: E402
 
 OUTPUT_ROOT = Path(
     os.environ.get(
-        "ERAF4XRD_OUTPUT_DIR",
+        "XRDREADER_OUTPUT_DIR",
         str(
             WORK_DIR
-            / "eraf4xrd_output"
+            / "xrdreader_output"
             / _dt.now().strftime("%Y-%m-%d_%H%M%S")
         ),
     )
