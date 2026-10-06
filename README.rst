@@ -141,8 +141,7 @@ Before contributing, please read the `Code of Conduct
 Contact
 -------
 
-Afnan Mostafa (amostafa@ur.rochester.edu), William Ratcliff (wratclif@umd.edu),
-Simon J. L. Billinge (sbillinge@ucsb.edu) and Niaz Abdolrahim (niaz@rochester.edu).
+Afnan Mostafa (amostafa@ur.rochester.edu or afnanmostafa102@gmail.com).
 
 License
 -------

@@ -1,4 +1,4 @@
-# XRDreader tutorial — your first run
+# XRDreader tutorial — from scratch
 
 This gets you from a brand-new computer to real results. No programming knowledge needed.
 
