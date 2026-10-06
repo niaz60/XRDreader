@@ -38,7 +38,8 @@ only appear in windows opened *after* they are installed.
 
 ## Part 2 — Open the right window
 
-This part matters. There are two similar-looking windows and only one of them works.
+This part matters. There are two similar-looking windows, and only one of them works
+straight out of the box.
 
 Click **Start**, type `Anaconda`, and click **Anaconda Powershell Prompt**.
 
@@ -52,6 +53,10 @@ A black window opens. The line at the bottom looks something like:
 ```
 
 That **`(base)`** at the start is how you know you have the right window.
+
+> Once you are comfortable, you can use any terminal you like, including the one inside VS
+> Code. Run `conda init powershell` once in this Anaconda window and every terminal will
+> understand `conda` from then on. Until you do that, stay in the Anaconda window.
 
 Now check both programs installed properly. Type this and press Enter:
 
@@ -292,7 +297,7 @@ diffai-xrdreader --full-run --sources arxiv -n 5 --dry-run
 
 | You see | What to do |
 |---|---|
-| `conda is not recognized` | You are in the wrong window. Close it and open **Anaconda Powershell Prompt** (Part 2) |
+| `conda is not recognized` | You are in the wrong window. Close it and open **Anaconda Powershell Prompt** (Part 2). To use other terminals, see the note at the end of Part 2 |
 | `git is not recognized` | Git did not install. Redo Part 1b, then open a new window |
 | `ModuleNotFoundError: No module named 'diffai.xrdreader'` | You forgot `conda activate xrdreader`. Run it and try again |
 | `Missing API key(s) for the steps this run would execute` | You forgot step 5b, or you opened a new window since. Redo 5b |

@@ -39,11 +39,11 @@ record for every paper it keeps:
     A vision model finds the figures and classifies which of them are XRD patterns.
 
 **Step II — metadata extraction** (``step2``, ``clean``)
-    Extracts crystal structure, space group, lattice parameters, phases and wavelength, then
-    normalises and deduplicates the records. The cleaning pass uses no model.
+    Extracts metadata—crystal structure, space group, lattice parameters, phases and wavelength, then
+    normalises and deduplicates the records. The cleaning function does not use any model.
 
 **Step III — validation** (``step3``)
-    A second model cross-checks every field against the text of the paper.
+    A second model cross-checks every field against the information in the paper.
 
 Run any subset with ``--steps``, for example ``--steps step2,clean,step3``.
 
@@ -54,8 +54,9 @@ Installation
 ------------
 
 You need `conda <https://docs.conda.io/en/latest/miniconda.html>`_ and
-`git <https://git-scm.com/downloads>`_. On Windows, use the **Anaconda Powershell Prompt**, not
-plain PowerShell. ::
+`git <https://git-scm.com/downloads>`_. On Windows the simplest shell is the **Anaconda
+Powershell Prompt**, the only one that knows ``conda`` without setup. Any other terminal works
+too, including the one in VS Code, once you have run ``conda init powershell`` in it once. ::
 
         git clone https://github.com/niaz60/XRDreader.git
         cd XRDreader
@@ -101,14 +102,14 @@ Documentation
 -------------
 
 * `HOW_TO_RUN.md <HOW_TO_RUN.md>`_ — the short reference: install, run, options, troubleshooting.
-* `TUTORIAL.md <TUTORIAL.md>`_ — step by step from a bare computer to your first results,
+* `TUTORIAL.md <TUTORIAL.md>`_ — step by step from scratch, literally,
   assuming no command-line experience.
 * `CLI_REFERENCE.md <CLI_REFERENCE.md>`_ — every flag and combination.
 
 Citation
 --------
 
-If you use XRDreader in a scientific publication, please cite the preprint, the benchmark data
+If you use XRDreader in a scientific publication, please cite the preprint (for now), the benchmark data
 and the software:
 
 * Preprint — `arXiv:2609.18583 <https://arxiv.org/abs/2609.18583>`_, where the framework appears

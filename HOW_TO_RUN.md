@@ -23,9 +23,13 @@ validates the result.
 
 Python 3.12+ is required; the install below creates it for you.
 
-> **On Windows, use the "Anaconda Powershell Prompt"** from the Start menu, not plain
-> PowerShell. A normal PowerShell window does not have `conda` on its PATH and will report
+> **On Windows, the simplest shell is the "Anaconda Powershell Prompt"** from the Start menu.
+> It is the only one that knows `conda` without setup; a plain PowerShell window reports
 > `conda : The term 'conda' is not recognized`.
+>
+> To use any other terminal instead, including the one inside VS Code, run `conda init
+> powershell` once from the Anaconda prompt and reopen the terminal. If PowerShell then refuses
+> to load your profile, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
 
 ---
 
@@ -190,7 +194,7 @@ from there. Ctrl+C to stop. CIF export and Materials Project lookups need
 
 | Message | Cause | Fix |
 |---|---|---|
-| `conda is not recognized` | Plain PowerShell, or conda not installed | Use the **Anaconda Powershell Prompt** |
+| `conda is not recognized` | conda is not set up for this shell, or not installed | Use the **Anaconda Powershell Prompt**, or run `conda init powershell` once to enable conda everywhere |
 | `ModuleNotFoundError: No module named 'diffai.xrdreader'` | `py -3.13` used, or environment not active | `conda activate xrdreader`, then `diffai-xrdreader` |
 | `Missing API key(s) for the steps this run would execute` | An enabled step has no key | Set the key it names, or use `--steps download` |
 | `ERROR: ... ipykernel ... requires tornado` during install | Unrelated package in your environment | Ignore — check for `Successfully installed` below it |
