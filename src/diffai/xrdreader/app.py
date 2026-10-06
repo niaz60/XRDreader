@@ -143,6 +143,27 @@ def _build_parser():
         "(no API calls, no downloads). Use it to check a command.",
     )
     ap.add_argument(
+        "--report",
+        metavar="DIR",
+        nargs="?",
+        const=".",
+        help="Build report.html for an existing run and exit. DIR is a run "
+        "folder, or any folder containing one (default: here). A run writes "
+        "this automatically when it finishes.",
+    )
+    ap.add_argument(
+        "--embed-report",
+        action="store_true",
+        help="Bake the figure images into the report instead of linking to "
+        "them, so the file can be moved or sent on its own. Much larger.",
+    )
+    ap.add_argument(
+        "--no-report",
+        action="store_true",
+        help="Do not write report.html at the end of the run "
+        "(WRITE_RUN_REPORT=false).",
+    )
+    ap.add_argument(
         "--ui",
         action="store_true",
         help="Open the web interface in a browser instead of running from "
@@ -216,6 +237,8 @@ def _apply_cli_flags(argv=None):
         os.environ["MODEL"] = args.model
     if args.single_pass:
         os.environ["DISABLE_ALL_AGENTS"] = "true"
+    if args.no_report:
+        os.environ["WRITE_RUN_REPORT"] = "false"
 
     # ---- generic escape hatch (applied last so it overrides anything above) ----
     for item in args.overrides:
@@ -311,6 +334,25 @@ def run():
         except Exception as e:
             log(f"Pipeline failed: {e}")
             raise
+        _write_report(log)
+
+
+def _write_report(log):
+    """Write report.html into the run folder, if the run asked for one.
+
+    A report is a convenience, so a failure here is reported and swallowed: a run
+    that produced its results has succeeded whether or not the page was written.
+    """
+    from diffai.xrdreader.config import OUTPUT_ROOT, WRITE_RUN_REPORT
+
+    if not WRITE_RUN_REPORT:
+        return
+    try:
+        from diffai.xrdreader.report import build_report
+
+        log(f"Report: {build_report(str(OUTPUT_ROOT))}")
+    except Exception as e:
+        log(f"[WARNING] Could not write the run report: {e}")
 
 
 def launch_ui():
@@ -361,6 +403,11 @@ def main():
     args = _apply_cli_flags()
     if args.ui:
         raise SystemExit(launch_ui())
+    if args.report is not None:
+        from diffai.xrdreader.report import build_report
+
+        print(build_report(args.report, embed=args.embed_report))
+        return
     if args.dry_run:
         _print_dry_run()
     else:

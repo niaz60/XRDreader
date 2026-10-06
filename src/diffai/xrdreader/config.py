@@ -52,6 +52,10 @@ RUN_JSON_VERIFY_AGENT = get_bool(
     "RUN_JSON_VERIFY_AGENT", False
 )  # Phase III <-- need to update the name
 
+# Write report.html into the run folder when the run finishes. It reads the run's
+# own output files, costs nothing extra, and lets anyone see what happened.
+WRITE_RUN_REPORT = get_bool("WRITE_RUN_REPORT", True)
+
 # ======================================================================================
 # DOWNLOAD SOURCE SWITCHES
 # ======================================================================================

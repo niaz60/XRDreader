@@ -84,6 +84,12 @@ xrdreader_output/2026-08-07_143022/
 The file ending `__phase3_validated_FINAL.json` holds the final extracted data. Use `-o NAME`
 to name the folder instead.
 
+**Every run also writes `report.html` in that folder.** Double-click it to see what happened: which
+papers were kept or rejected and why, the figures it found, the metadata it pulled out, and every
+tool its agents called. It opens in your browser with no server and no network. Keep it in its
+folder, since it reads the images beside it, or rebuild it anywhere with
+`diffai-xrdreader --report FOLDER --embed-report` to get a copy you can send to someone.
+
 **Two things reset when you open a new terminal** — repeat them each session:
 
 ```bash
@@ -119,6 +125,9 @@ steps, model, output folder — and exits without downloading or calling the AI.
 | `--set KEY=VALUE` | Set any config value directly (repeatable) |
 | `-o DIR` | Name the output folder |
 | `--dry-run` | Print the resolved configuration and exit — no cost |
+| `--report DIR` | Build `report.html` for an earlier run and exit |
+| `--embed-report` | Put the images inside the report so it can be sent on its own |
+| `--no-report` | Do not write `report.html` when the run finishes |
 | `--ui` | Launch the web interface |
 | `--help` | Full option list |
 

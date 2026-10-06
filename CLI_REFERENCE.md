@@ -33,8 +33,9 @@ Every command is `diffai-xrdreader [options]` (or, equivalently,
 11. [Mix models across steps](#11-mix-models-across-steps)
 12. [Advanced: set any config value](#12-advanced-set-any-config-value)
 13. [Where results go (and resuming runs)](#13-where-results-go-and-resuming-runs)
-14. [Ready-made recipes](#14-ready-made-recipes)
-15. [Commands that should fail](#15-commands-that-should-fail)
+14. [See what a run did (report.html)](#14-see-what-a-run-did-reporthtml)
+15. [Ready-made recipes](#15-ready-made-recipes)
+16. [Commands that should fail](#16-commands-that-should-fail)
 - [Cleaning up](#cleaning-up)
 
 ---
@@ -335,7 +336,32 @@ agent may inspect a figure, and a text-only model would `400` if it does.*
 
 ---
 
-## 14. Ready-made recipes
+## 14. See what a run did (report.html)
+Every run writes `report.html` beside its `documents/`, `results/` and `logs/` folders. Open it in a
+browser — no server, no network — to see which papers were kept or rejected and why, the figure crops
+Step I cut out and how it classified each, the metadata Step II extracted, and every tool call each
+step's agent made.
+
+```bash
+# build one for a run that already finished
+diffai-xrdreader --report xrdreader_output6-08-07_143045
+
+# the newest run under a folder, if you cannot remember which
+diffai-xrdreader --report .
+
+# a copy that can be emailed: images baked in, so it no longer needs the run folder
+diffai-xrdreader --report xrdreader_output6-08-07_143045 --embed-report
+
+# skip writing it at the end of a run
+diffai-xrdreader --full-run -n 1 --no-report
+```
+*The default report links to the images in `results/`, so it is around 100 KB but must stay in its
+folder. `--embed-report` makes it self-contained and much larger. `WRITE_RUN_REPORT=false` turns the
+automatic write off permanently.*
+
+---
+
+## 15. Ready-made recipes
 Useful real-world combinations, copy-paste ready.
 
 ```bash
@@ -360,7 +386,7 @@ diffai-xrdreader --full-run -n 3 --elements "Mo OR Molybdenum" --sources arxiv -
 
 ---
 
-## 15. Commands that should fail
+## 16. Commands that should fail
 These should each print a one-line `error: …` and exit non-zero — handy for testing input validation.
 
 ```bash

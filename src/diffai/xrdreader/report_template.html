@@ -1,0 +1,495 @@
+<title>XRDreader Run Trace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;1,400&display=swap">
+
+<style>
+/* Layout: run header → paper list → executed-path flowchart → one detail stage per step. */
+:root {
+  --bg:#f4f5f7; --surface:#ffffff; --surface-2:#eceef1; --line:#d6dade; --line-soft:#e5e8eb;
+  --ink:#1b2227; --ink-2:#4d575f; --ink-3:#5f6b73;
+  --accent:#a65f2b; --accent-ink:#8f5122; --accent-sl:#f3e5d8;
+  --keep:#1f6f5c; --keep-bg:#dff0ea; --drop:#9b3b32; --drop-bg:#f6e2df;
+  --on-accent:#ffffff;
+  --font-ui:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --font-doc:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#11161a; --surface:#181e23; --surface-2:#1f262c; --line:#2e373e; --line-soft:#242c32;
+    --ink:#e7ebee; --ink-2:#a9b4bc; --ink-3:#8a949b;
+    --accent:#e09a5a; --accent-ink:#e09a5a; --accent-sl:#3a2a1b;
+    --keep:#5fc6a7; --keep-bg:#17332c; --drop:#e18b80; --drop-bg:#38211e; --on-accent:#1b1206;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#11161a; --surface:#181e23; --surface-2:#1f262c; --line:#2e373e; --line-soft:#242c32;
+  --ink:#e7ebee; --ink-2:#a9b4bc; --ink-3:#8a949b;
+  --accent:#e09a5a; --accent-ink:#e09a5a; --accent-sl:#3a2a1b;
+  --keep:#5fc6a7; --keep-bg:#17332c; --drop:#e18b80; --drop-bg:#38211e; --on-accent:#1b1206;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1160px; margin: 0 auto; padding-inline: 20px; padding-block: 26px 56px; }
+h1,h2,h3 { text-wrap: balance; margin: 0; font-weight: 600; }
+p { margin: 0; }
+code,.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.eyebrow { font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+
+/* header */
+.run-head { display: grid; gap: 18px; grid-template-columns: minmax(0,1.5fr) minmax(0,1fr); padding: 18px 20px; margin-bottom: 18px; }
+.run-head h1 { font-size: 19px; margin-top: 5px; }
+.cmd { font-family: var(--font-mono); font-size: 12px; color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--line-soft); border-radius: 6px; padding: 7px 10px; margin-top: 11px; overflow-x: auto; white-space: nowrap; }
+.totals { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft); border-radius: 8px; overflow: hidden; align-content: start; }
+.tot { background: var(--surface); padding: 10px 12px; }
+.tot .v { font-family: var(--font-mono); font-size: 18px; font-variant-numeric: tabular-nums; }
+.tot .k { font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); }
+
+/* theme control + run picker */
+.head-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.head-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.run-pick { display: flex; align-items: center; gap: 7px; }
+.run-pick select {
+  font: inherit; font-family: var(--font-mono); font-size: 12px; color: var(--ink);
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: 7px;
+  padding: 4px 8px; max-width: 320px; cursor: pointer;
+}
+.run-pick select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.theme-sw { display: flex; gap: 2px; border: 1px solid var(--line); border-radius: 999px; padding: 2px; background: var(--surface-2); flex: 0 0 auto; }
+.theme-sw button { font: inherit; font-size: 11px; letter-spacing: .03em; padding: 3px 10px; border: 0; border-radius: 999px; background: none; color: var(--ink-3); cursor: pointer; }
+.theme-sw button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.theme-sw button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* crop / full-page switch */
+.view-sw { display: flex; gap: 6px; margin: 10px 0 0; }
+.view-sw button { font: inherit; font-size: 12px; cursor: pointer; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink-2); }
+.view-sw button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.view-sw button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.page-view { background: #fff; }
+
+/* paper list */
+.papers { display: grid; gap: 8px; margin-bottom: 18px; }
+.paper {
+  text-align: left; font: inherit; color: inherit; cursor: pointer; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 9px; padding: 11px 13px;
+  display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 12px; align-items: center;
+}
+.paper:hover { border-color: var(--accent); }
+.paper[aria-selected="true"] { border-color: var(--accent); background: var(--accent-sl); }
+.paper:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pill { font-size: 11px; font-weight: 600; letter-spacing: .05em; border-radius: 5px; padding: 3px 8px; white-space: nowrap; }
+.pill.keep { background: var(--keep-bg); color: var(--keep); }
+.pill.drop { background: var(--drop-bg); color: var(--drop); }
+.paper .ttl { font-size: 13.5px; line-height: 1.35; min-width: 0; }
+.paper .meta { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-2); text-align: right; white-space: nowrap; }
+.paper .src { font-family: var(--font-mono); font-size: 11px; color: var(--ink-2); }
+
+/* flowchart */
+.flow { padding: 16px 18px 18px; margin-bottom: 18px; }
+.flow-rail { display: flex; gap: 0; align-items: stretch; overflow-x: auto; padding-bottom: 6px; }
+.node {
+  flex: 1 1 0; min-width: 158px; text-align: left; font: inherit; color: inherit; cursor: pointer;
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 11px;
+  display: grid; gap: 6px; align-content: start;
+}
+.node[data-state="off"] { border-style: dashed; background: transparent; color: var(--ink-3); cursor: default; }
+.node[aria-selected="true"] { border-color: var(--accent); background: var(--accent-sl); }
+.node:not([data-state="off"]):hover { border-color: var(--accent); }
+.node:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.node .nn { font-family: var(--font-mono); font-size: 11px; letter-spacing: .04em; color: var(--accent-ink); }
+.node[data-state="off"] .nn { color: var(--ink-3); }
+.node .nt { font-size: 13px; font-weight: 600; line-height: 1.25; }
+.node .nm { font-family: var(--font-mono); font-size: 11px; color: var(--ink-2); }
+.tools { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+.tool-chip { font-family: var(--font-mono); font-size: 10.5px; border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; color: var(--ink-2); background: var(--surface); }
+.tool-chip .x { color: var(--ink-3); }
+.arrow-cell { flex: 0 0 26px; display: flex; align-items: center; justify-content: center; color: var(--ink-3); font-family: var(--font-mono); font-size: 15px; }
+.arrow-cell.stop { color: var(--drop); font-weight: 600; }
+.flow-note { font-size: 12.5px; color: var(--ink-3); margin-top: 11px; }
+
+/* stage */
+.stage { padding: 20px; }
+.stage-head { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--line-soft); padding-bottom: 13px; margin-bottom: 16px; }
+.stage-head h2 { font-size: 16px; }
+.stage-head .sub { color: var(--ink-2); font-size: 13px; max-width: 64ch; margin-top: 4px; }
+.stage-stats { display: flex; gap: 13px; font-family: var(--font-mono); font-size: 12px; color: var(--ink-3); }
+.panel-grid { display: grid; gap: 18px; grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+.block { min-width: 0; }
+.block > h3 { font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 9px; }
+.verdict { display: inline-flex; align-items: center; gap: 8px; border-radius: 6px; padding: 5px 10px; font-weight: 600; font-size: 13px; }
+.verdict.keep { background: var(--keep-bg); color: var(--keep); }
+.verdict.drop { background: var(--drop-bg); color: var(--drop); }
+.verdict .conf { font-family: var(--font-mono); font-weight: 400; font-size: 12px; opacity: .85; }
+.quote { font-family: var(--font-doc); font-size: 13.5px; line-height: 1.6; color: var(--ink-2); border-left: 2px solid var(--line); padding: 2px 0 2px 14px; }
+.notice { font-size: 13px; color: var(--ink-2); background: var(--surface-2); border: 1px dashed var(--line); border-radius: 8px; padding: 14px 16px; }
+
+/* candidates */
+.strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; }
+.cand { flex: 0 0 auto; width: 92px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 7px; padding: 6px; cursor: pointer; font: inherit; color: inherit; display: grid; gap: 5px; }
+.cand:hover { border-color: var(--accent); }
+.cand[aria-selected="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-sl); }
+.cand:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cand img { width: 100%; height: 56px; object-fit: cover; object-position: top center; border-radius: 3px; background: #fff; display: block; }
+.cand .pg { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-3); }
+.dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: 1px; }
+.dot.keep { background: var(--keep); } .dot.drop { background: var(--drop); }
+.cand-view { margin-top: 12px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fff; }
+.cand-view img { display: block; width: 100%; }
+.cand-cap { font-size: 12.5px; color: var(--ink-2); padding: 10px 12px; background: var(--surface-2); border-top: 1px solid var(--line); }
+
+/* figure switch */
+.fig-switch { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.fig-switch button { font: inherit; font-size: 12.5px; cursor: pointer; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink-2); }
+.fig-switch button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.fig-switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* tables */
+table.fields { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.fields td { padding: 6px 10px 6px 0; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+table.fields td.k { font-family: var(--font-mono); font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+table.fields td.v { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink); word-break: break-word; }
+.scroll-x { overflow-x: auto; }
+.empty-note { font-size: 12.5px; color: var(--ink-3); margin-top: 10px; }
+
+/* trace */
+.trace { display: grid; gap: 5px; }
+.trace-row { border: 1px solid var(--line-soft); border-radius: 7px; background: var(--surface-2); overflow: hidden; }
+.trace-row > button { width: 100%; text-align: left; font: inherit; cursor: pointer; background: none; border: 0; color: inherit; display: flex; gap: 10px; align-items: baseline; padding: 8px 11px; }
+.trace-row > button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.trace-row .ix { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); min-width: 18px; }
+.trace-row .tool { font-family: var(--font-mono); font-size: 12.5px; color: var(--accent-ink); font-weight: 500; }
+.trace-row .args { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-3); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.obs { padding: 0 12px 11px 39px; font-size: 12.5px; color: var(--ink-2); font-family: var(--font-doc); line-height: 1.55; }
+.obs .lbl { font-family: var(--font-ui); font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); display: block; margin-bottom: 4px; }
+
+/* verified */
+.vf { display: grid; gap: 9px; }
+.vf-item { border: 1px solid var(--line-soft); border-radius: 7px; padding: 10px 12px; background: var(--surface-2); }
+.vf-item .name { font-family: var(--font-mono); font-size: 12px; }
+.vf-item .flow2 { font-family: var(--font-mono); font-size: 12px; color: var(--ink-2); margin-top: 4px; display: flex; gap: 7px; flex-wrap: wrap; align-items: baseline; }
+.vf-item .arrow { color: var(--ink-3); }
+.vf-item .same { color: var(--keep); font-size: 11px; font-family: var(--font-ui); letter-spacing: .04em; text-transform: uppercase; }
+.vf-item .ev { font-family: var(--font-doc); font-size: 12.5px; color: var(--ink-2); margin-top: 7px; line-height: 1.5; border-left: 2px solid var(--line); padding-left: 10px; }
+
+.foot { color: var(--ink-3); font-size: 12px; margin-top: 22px; line-height: 1.6; }
+.foot code { font-size: 11.5px; color: var(--ink-2); }
+
+@media (max-width: 900px) {
+  .run-head { grid-template-columns: minmax(0,1fr); }
+  .panel-grid { grid-template-columns: minmax(0,1fr); }
+  .paper { grid-template-columns: auto minmax(0,1fr); }
+  .paper .meta { grid-column: 2; text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="card run-head">
+    <div>
+      <div class="head-top">
+        <div>
+          <div class="eyebrow" id="run-when"></div>
+          <h1 id="run-title">XRDreader run explorer</h1>
+        </div>
+        <div class="head-right">
+          <label class="run-pick" id="run-pick" hidden>
+            <span class="eyebrow">Run</span>
+            <select id="run-select" aria-label="Choose a run"></select>
+          </label>
+          <div class="theme-sw" id="theme" role="group" aria-label="Colour theme">
+          <button data-theme-set="system" aria-pressed="true">Auto</button>
+          <button data-theme-set="light" aria-pressed="false">Light</button>
+            <button data-theme-set="dark" aria-pressed="false">Dark</button>
+          </div>
+        </div>
+      </div>
+      <div class="cmd" id="run-cmd"></div>
+    </div>
+    <div class="totals" id="totals"></div>
+  </header>
+
+  <div class="eyebrow" style="margin:0 2px 8px">Documents in this run — pick one</div>
+  <div class="papers" id="papers" role="tablist" aria-label="Documents"></div>
+
+  <section class="card flow" aria-label="Executed path">
+    <div class="eyebrow">Path executed for this document — click a step</div>
+    <div class="flow-rail" id="flow" role="tablist"></div>
+    <p class="flow-note" id="flow-note"></p>
+  </section>
+
+  <section class="card stage" id="stage" role="tabpanel" aria-live="polite"></section>
+
+  <p class="foot" id="foot"></p>
+</div>
+
+<script type="application/json" id="run-data">
+/*__DATA__*/
+</script>
+
+<script>
+(function () {
+  "use strict";
+  var D = JSON.parse(document.getElementById("run-data").textContent);
+  // one page can carry several runs; older files held a single run at the top level
+  var RUNS = D.runs || [{ run: D.run, papers: D.papers }];
+  var ri = 0, P = RUNS[0].papers, pi = 0, si = 0, fi = 0, openTrace = -1, candIx = 0, candView = "crop";
+
+  // ---- theme: Auto follows the viewer, Light/Dark override it ----
+  var themeBox = document.getElementById("theme");
+  function setTheme(mode) {
+    if (mode === "system") { delete document.documentElement.dataset.theme; }
+    else { document.documentElement.dataset.theme = mode; }
+    Array.prototype.forEach.call(themeBox.children, function (b) {
+      b.setAttribute("aria-pressed", b.dataset.themeSet === mode);
+    });
+    try { localStorage.setItem("xrdreader-theme", mode); } catch (e) { /* private window */ }
+  }
+  themeBox.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-theme-set]"); if (b) setTheme(b.dataset.themeSet);
+  });
+  var saved = "system";
+  try { saved = localStorage.getItem("xrdreader-theme") || "system"; } catch (e) { /* ignore */ }
+  setTheme(saved);
+
+  var STEP_META = [
+    { key: "s0", n: "Step 0", t: "Download &amp; screening",
+      sub: "The PDF is fetched, then an agent decides whether the paper really contains XRD work. A reject here stops everything downstream." },
+    { key: "s1", n: "Step I", t: "Figure detection",
+      sub: "Pages are rendered, figure-like regions cropped, and a vision model rules on which crops are diffraction patterns and matches each to its caption." },
+    { key: "s2", n: "Step II", t: "Metadata extraction",
+      sub: "Each confirmed figure is read with its caption and surrounding text to fill a fixed crystallographic schema." },
+    { key: "s3", n: "Step III", t: "Validation",
+      sub: "A second agent re-derives every field from the paper itself, using tools that search the PDF, and records the evidence behind each answer." }
+  ];
+
+  var esc = function (s) { return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  var money = function (v) { return "$" + (+v || 0).toFixed(4); };
+  var fmtVal = function (v) {
+    if (v === null || v === undefined || v === "") return "";
+    if (Array.isArray(v)) return v.filter(function (x) { return x !== null && x !== ""; }).join(", ");
+    if (typeof v === "object") return Object.keys(v).map(function (k) { return k + " = " + fmtVal(v[k]); }).join("   ");
+    return String(v);
+  };
+  var argStr = function (a) {
+    if (!a || !Object.keys(a).length) return "( )";
+    return "( " + Object.keys(a).map(function (k) { return k + ": " + fmtVal(a[k]); }).join(", ") + " )";
+  };
+  var toolCounts = function (traces) {
+    var c = {};
+    (traces || []).forEach(function (t) { (t || []).forEach(function (s) { if (s && s.tool) c[s.tool] = (c[s.tool] || 0) + 1; }); });
+    return Object.keys(c).sort(function (a, b) { return c[b] - c[a]; }).map(function (k) { return [k, c[k]]; });
+  };
+
+  // ---- run picker ----
+  var sel = document.getElementById("run-select");
+  sel.innerHTML = RUNS.map(function (r, i) {
+    return '<option value="' + i + '">' + esc(r.run.label) +
+      (r.run.folder ? "  (" + esc(r.run.folder) + ")" : "") + " — " + r.run.n_pdfs +
+      " pdf" + (r.run.n_pdfs === 1 ? "" : "s") + ", " + money(r.run.cost) + "</option>";
+  }).join("");
+  if (RUNS.length > 1) document.getElementById("run-pick").hidden = false;
+  sel.addEventListener("change", function () {
+    ri = +sel.value; P = RUNS[ri].papers;
+    pi = 0; si = 0; fi = 0; candIx = 0; candView = "crop"; openTrace = -1;
+    drawHeader(); render();
+  });
+
+  // ---- header ----
+  function drawHeader() {
+    var R = RUNS[ri].run;
+    document.getElementById("run-when").textContent = R.label;
+    document.getElementById("run-cmd").textContent = R.command;
+    document.getElementById("totals").innerHTML = [
+      [R.n_pdfs + " / " + R.kept, "pdfs / kept"],
+      [R.calls, "model calls"],
+      [money(R.cost), "api cost"],
+      [R.wall.toFixed(0) + " s", "wall clock"]
+    ].map(function (t) { return '<div class="tot"><div class="v">' + t[0] + '</div><div class="k">' + t[1] + "</div></div>"; }).join("");
+    document.getElementById("foot").innerHTML = R.foot;
+  }
+  drawHeader();
+
+  // ---- paper list ----
+  function drawPapers() {
+  document.getElementById("papers").innerHTML = P.map(function (p, i) {
+    var keep = p.decision === "keep";
+    return '<button class="paper" role="tab" aria-selected="' + (i === pi) + '" data-paper="' + i + '">' +
+      '<span class="pill ' + (keep ? "keep" : "drop") + '">' + (keep ? "KEPT" : "REJECTED") + "</span>" +
+      '<span class="ttl">' + esc(p.title) + '<br><span class="src">' + esc(p.source) +
+        (p.doi ? " · " + esc(p.doi) : "") + "</span></span>" +
+      '<span class="meta">' + money(p.cost) + " · " + p.calls + " calls<br>" +
+        (keep ? p.figures.length + " XRD figure" + (p.figures.length === 1 ? "" : "s") : "stopped at Step 0") +
+      "</span></button>";
+  }).join("");
+  }
+
+  // ---- flowchart ----
+  function drawFlow() {
+    var p = P[pi], keep = p.decision === "keep";
+    var parts = [];
+    STEP_META.forEach(function (m, i) {
+      var st = p.steps[m.key];
+      var on = st && st.calls > 0;
+      if (i > 0) parts.push('<span class="arrow-cell' + (!on && i === 1 ? "" : "") + '">' + (on ? "→" : "⇢") + "</span>");
+      parts.push(
+        '<button class="node" role="tab" data-step="' + i + '" data-state="' + (on ? "on" : "off") + '"' +
+        ' aria-selected="' + (i === si && on) + '"' + (on ? "" : " disabled") + ">" +
+          '<span class="nn">' + m.n + "</span>" +
+          '<span class="nt">' + m.t + "</span>" +
+          '<span class="nm">' + (on ? st.calls + " calls · " + money(st.cost) : "not executed") + "</span>" +
+          '<span class="tools">' + (on ? toolCounts(st.traces).slice(0, 6).map(function (tc) {
+            return '<span class="tool-chip">' + esc(tc[0]) + (tc[1] > 1 ? ' <span class="x">×' + tc[1] + "</span>" : "") + "</span>";
+          }).join("") : "") + "</span>" +
+        "</button>");
+    });
+    document.getElementById("flow").innerHTML = parts.join("");
+    document.getElementById("flow-note").innerHTML = keep
+      ? "Tool chips show what each step's agent actually called on this document, with repeat counts."
+      : "Screening rejected this document, so Steps I–III never ran. It cost " + money(p.cost) +
+        " instead of the " + money(RUNS[ri].run.avg_kept_cost) + " an average kept document cost in this run.";
+  }
+
+  // ---- stage bodies ----
+  function head(m, st, extra) {
+    return '<div class="stage-head"><div><div class="eyebrow">' + m.n + "</div><h2>" + m.t +
+      '</h2><p class="sub">' + m.sub + "</p></div>" +
+      (st && st.calls ? '<div class="stage-stats"><span>' + st.calls + " calls</span><span>" +
+        money(st.cost) + "</span><span>" + st.sec.toFixed(1) + " s</span></div>" : "") +
+      "</div>" + (extra || "");
+  }
+  function figSwitch(p) {
+    if (p.figures.length < 2) return "";
+    return '<div class="fig-switch" role="tablist">' + p.figures.map(function (f, i) {
+      return '<button role="tab" aria-selected="' + (i === fi) + '" data-fig="' + i + '">Figure ' + esc(f.n) + " · p" + esc(f.page) + "</button>";
+    }).join("") + "</div>";
+  }
+  function traceList(tr) {
+    if (!tr || !tr.length) return '<p class="empty-note">No tool calls were recorded for this step.</p>';
+    return '<div class="trace">' + tr.map(function (s, i) {
+      return '<div class="trace-row"><button data-trace="' + i + '" aria-expanded="' + (openTrace === i) + '">' +
+        '<span class="ix">' + (i + 1) + '</span><span class="tool">' + esc(s.tool) + "</span>" +
+        '<span class="args">' + esc(argStr(s.args)) + "</span></button>" +
+        (openTrace === i && s.obs ? '<div class="obs"><span class="lbl">what came back</span>' + esc(s.obs) + "…</div>" : "") +
+        "</div>";
+    }).join("") + "</div>";
+  }
+
+  function body0(p) {
+    var keep = p.decision === "keep";
+    return head(STEP_META[0], p.steps.s0,
+      '<div class="panel-grid"><div class="block"><h3>Verdict</h3>' +
+        '<div class="verdict ' + (keep ? "keep" : "drop") + '">' + (keep ? "KEEP" : "REJECT") +
+        '<span class="conf">confidence ' + p.confidence + "</span></div>" +
+        '<div class="quote" style="margin-top:12px">' + esc(p.reason) + "</div></div>" +
+      '<div class="block"><h3>' + (p.steps.s0.traces[0] || []).length + " tool calls — click one</h3>" +
+        traceList(p.steps.s0.traces[0]) + "</div></div>");
+  }
+
+  function body1(p) {
+    if (!p.steps.s1.calls) return head(STEP_META[1], null, '<p class="notice">Not executed. Screening rejected this document.</p>');
+    var c = p.candidates[candIx] || p.candidates[0];
+    var strip = p.candidates.map(function (cd, i) {
+      return '<button class="cand" role="tab" aria-selected="' + (i === candIx) + '" data-cand="' + i + '">' +
+        '<img src="' + cd.img + '" alt="Candidate crop from page ' + cd.page + '">' +
+        '<span class="pg"><span class="dot ' + (cd.is_xrd ? "keep" : "drop") + '"></span>p' + cd.page + "</span></button>";
+    }).join("");
+    var showPage = candView === "page" && c.overlay;
+    var sw = c.overlay
+      ? '<div class="view-sw" role="tablist" aria-label="Candidate view">' +
+          '<button role="tab" data-view="crop" aria-selected="' + (!showPage) + '">Cropped region</button>' +
+          '<button role="tab" data-view="page" aria-selected="' + (!!showPage) + '">Full page, as detected</button>' +
+        "</div>"
+      : "";
+
+    return head(STEP_META[1], p.steps.s1,
+      '<div class="block"><h3>' + p.candidates.length + " candidate crops · " +
+        p.figures.length + " confirmed as XRD</h3>" +
+        '<div class="strip" role="tablist">' + strip + "</div>" + sw +
+        '<div class="cand-view' + (showPage ? " page-view" : "") + '"><img src="' +
+          (showPage ? c.overlay : c.img) + '" alt="' +
+          (showPage ? "Page " + c.page + " with the detected region outlined" : "Candidate crop from page " + c.page) + '">' +
+        '<div class="cand-cap"><span class="verdict ' + (c.is_xrd ? "keep" : "drop") + '" style="font-size:12px;padding:3px 8px">' +
+          (c.is_xrd ? "XRD pattern" + (c.conf ? " · " + c.conf : "") : "not a diffraction pattern") + "</span> " +
+          '<span style="margin-left:8px">' + (showPage
+            ? "Page " + c.page + " as the detector saw it — the box is the region it cut out."
+            : esc(c.note)) + "</span></div></div></div>" +
+      '<div class="block" style="margin-top:18px"><h3>Tool calls while classifying</h3>' +
+        traceList(p.steps.s1.traces[Math.min(fi, p.steps.s1.traces.length - 1)]) + "</div>");
+  }
+
+  function body2(p) {
+    if (!p.steps.s2.calls) return head(STEP_META[2], null, '<p class="notice">Not executed. Screening rejected this document.</p>');
+    var f = p.figures[fi], md = f.metadata || {}, pl = f.plot_info || {};
+    var filled = Object.keys(md).filter(function (k) { return fmtVal(md[k]) !== ""; });
+    var plk = Object.keys(pl).filter(function (k) { return fmtVal(pl[k]) !== ""; });
+    return head(STEP_META[2], p.steps.s2, figSwitch(p) +
+      '<div class="panel-grid"><div class="block"><h3>' + filled.length + " of " + Object.keys(md).length + " schema fields filled</h3>" +
+        '<div class="scroll-x"><table class="fields"><tbody>' + filled.map(function (k) {
+          return '<tr><td class="k">' + esc(k) + '</td><td class="v">' + esc(fmtVal(md[k])) + "</td></tr>"; }).join("") +
+        '</tbody></table></div><p class="empty-note">' + (Object.keys(md).length - filled.length) +
+        " fields stayed empty — the schema is fixed, so anything the paper never reports is left blank rather than guessed.</p></div>" +
+      '<div class="block"><h3>Read off the plot itself</h3><div class="scroll-x"><table class="fields"><tbody>' +
+        plk.map(function (k) { return '<tr><td class="k">' + esc(k) + '</td><td class="v">' + esc(fmtVal(pl[k])) + "</td></tr>"; }).join("") +
+        "</tbody></table></div></div></div>");
+  }
+
+  function body3(p) {
+    if (!p.steps.s3.calls) return head(STEP_META[3], null, '<p class="notice">Not executed. Screening rejected this document.</p>');
+    var f = p.figures[fi], ver = f.verified || {}, names = Object.keys(ver);
+    return head(STEP_META[3], p.steps.s3, figSwitch(p) +
+      '<div class="panel-grid"><div class="block"><h3>' + (f.s3_trace || []).length +
+        " tool calls on figure " + esc(f.n) + " — click one</h3>" + traceList(f.s3_trace) + "</div>" +
+      '<div class="block"><h3>' + names.length + ' fields re-derived from the paper</h3><div class="vf">' +
+        names.map(function (k) {
+          var v = ver[k], a = fmtVal(v.candidate), b = fmtVal(v.corrected), same = a === b;
+          return '<div class="vf-item"><div class="name">' + esc(k) + "</div>" +
+            '<div class="flow2"><span>' + (esc(a) || "<em>empty</em>") + "</span>" +
+            (same ? '<span class="same">confirmed</span>' : '<span class="arrow">→</span><span>' + esc(b) + "</span>") + "</div>" +
+            (v.evidence ? '<div class="ev">' + esc(v.evidence) + "…</div>" : "") + "</div>";
+        }).join("") + "</div></div></div>");
+  }
+
+  var BODIES = [body0, body1, body2, body3];
+  function render() {
+    drawPapers();
+    if (!P.length) {                       // a download-only run, or one where nothing was fetched
+      document.getElementById("flow").innerHTML = "";
+      document.getElementById("flow-note").textContent =
+        "This run downloaded no documents, so no step ran on anything.";
+      document.getElementById("stage").innerHTML =
+        '<p class="notice">No documents in this run. Pick another run above.</p>';
+      return;
+    }
+    var p = P[pi];
+    if (!p.steps[STEP_META[si].key].calls) si = 0;
+    if (fi >= p.figures.length) fi = 0;
+    if (candIx >= p.candidates.length) candIx = 0;
+    Array.prototype.forEach.call(document.getElementById("papers").children, function (b, i) {
+      b.setAttribute("aria-selected", i === pi);
+    });
+    drawFlow();
+    document.getElementById("stage").innerHTML = BODIES[si](p);
+  }
+
+  document.getElementById("papers").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-paper]"); if (!b) return;
+    pi = +b.dataset.paper; si = 0; fi = 0; candIx = 0; openTrace = -1; render();
+  });
+  document.getElementById("flow").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-step]"); if (!b || b.disabled) return;
+    si = +b.dataset.step; openTrace = -1; render();
+  });
+  document.getElementById("stage").addEventListener("click", function (e) {
+    var v = e.target.closest("[data-view]"); if (v) { candView = v.dataset.view; render(); return; }
+    var c = e.target.closest("[data-cand]"); if (c) { candIx = +c.dataset.cand; render(); return; }
+    var f = e.target.closest("[data-fig]"); if (f) { fi = +f.dataset.fig; openTrace = -1; render(); return; }
+    var t = e.target.closest("[data-trace]"); if (t) { var i = +t.dataset.trace; openTrace = (openTrace === i ? -1 : i); render(); }
+  });
+
+  render();
+})();
+</script>

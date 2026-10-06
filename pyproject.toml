@@ -69,6 +69,10 @@ include = ["*"]  # package names should match these glob patterns (["*"] by defa
 exclude = []  # exclude packages matching these glob patterns (empty by default)
 namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
 
+[tool.setuptools.package-data]
+# report.py reads this template at runtime, so it has to be installed beside it.
+"diffai.xrdreader" = ["report_template.html"]
+
 [project.scripts]
 diffai-xrdreader = "diffai.xrdreader.app:main"
 
