@@ -28,15 +28,24 @@ it from source as shown below.
 What it does
 ------------
 
-Given search terms such as ``Cu OR Copper``, XRDreader runs six steps and leaves a validated
-JSON record for every paper it keeps:
+Given keywords such as ``Cu OR Copper``, XRDreader runs four steps and leaves a validated JSON
+record for every paper it keeps:
 
-1. **Download** — open-access PDFs from arXiv, Springer, Elsevier and CrossRef/Unpaywall.
-2. **Screen** — a model judges whether each paper genuinely contains XRD work, and rejects the rest.
-3. **Detect figures** — a vision model finds the figures and classifies which are XRD patterns.
-4. **Extract metadata** — crystal structure, space group, lattice parameters, phases, wavelength.
-5. **Clean** — normalise and deduplicate the extracted records.
-6. **Validate** — a second model cross-checks every field against the text of the paper.
+**Step 0 — download and screening** (``download``, ``step0``)
+    Collects open-access PDFs from arXiv, Springer, Elsevier and CrossRef/Unpaywall, then a
+    model judges whether each paper genuinely contains XRD work and rejects the rest.
+
+**Step I — figure detection** (``step1``)
+    A vision model finds the figures and classifies which of them are XRD patterns.
+
+**Step II — metadata extraction** (``step2``, ``clean``)
+    Extracts crystal structure, space group, lattice parameters, phases and wavelength, then
+    normalises and deduplicates the records. The cleaning pass uses no model.
+
+**Step III — validation** (``step3``)
+    A second model cross-checks every field against the text of the paper.
+
+Run any subset with ``--steps``, for example ``--steps step2,clean,step3``.
 
 Each step can use a different LLM provider: OpenAI, Anthropic, Google, xAI, or open-source
 models through Together AI.
