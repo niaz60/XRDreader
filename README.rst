@@ -146,7 +146,7 @@ Before contributing, please read the `Code of Conduct
 Contact
 -------
 
-Afnan Mostafa (amostafa@ur.rochester.edu or afnanmostafa102@gmail.com).
+amostafa@ur.rochester.edu or afnanmostafa102@gmail.com
 
 License
 -------
